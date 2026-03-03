@@ -1,0 +1,6 @@
+{
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.project.sourcePaths": [
+        "homework01/20235718-LeVietHoa/CalculatorSwing"
+    ]
+}
