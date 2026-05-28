@@ -1,36 +1,43 @@
 module itss.group11 {
-    // JavaFX
+    // --- REQUIRES ---
     requires javafx.controls;
     requires javafx.fxml;
     
-    // Database & ORM
     requires java.sql;
     requires jakarta.persistence;
     requires org.hibernate.orm.core; 
     
-    // Spring Boot Core & JPA
+    requires spring.boot.starter.data.jpa; // Gộp chung nếu cần thiết
     requires spring.data.jpa;
-    requires spring.data.commons; // <-- BẮT BUỘC THÊM DÒNG NÀY ĐỂ HẾT LỖI @Param
+    requires spring.data.commons; 
     requires spring.context;
     requires spring.beans;
     requires spring.tx;
-
-    // Spring Web
     requires spring.web;
 
-    // Tiện ích
     requires java.dotenv;
     requires lombok;
 
-    // Reflection config
-    opens itss.group11.models to org.hibernate.orm.core, spring.core, spring.beans;
-    opens itss.group11.controllers.allocation to spring.core, spring.beans, spring.context;
+    // --- OPENS (CẤU HÌNH ĐỂ SPRING/JAVAFX HOẠT ĐỘNG) ---
     
-    // BẮT BUỘC THÊM: Cho phép Spring Data tạo proxy cho các Repository nằm trong package allocation
+    // 1. Cho phép Hibernate và Spring truy cập các Entity (Models)
+    opens itss.group11.models to org.hibernate.orm.core, spring.core, spring.beans;
+    
+    // 2. Cho phép Spring quản lý các Repository và Service
     opens itss.group11.repository.allocation to spring.core, spring.beans, spring.context;
+    opens itss.group11.services.allocation to spring.core, spring.beans, spring.context;
 
-    opens itss.group11 to javafx.fxml;
-    opens itss.group11.controllers to javafx.fxml;
+    // 3. CẤU HÌNH CONTROLLER (ĐÃ SỬA: Thêm đường dẫn đúng tới DashboardController)
+    // Mở gói chứa các Controller cho Spring và JavaFX
+    opens itss.group11.frontend.screens.dashboard to javafx.fxml, spring.core, spring.beans, spring.context;
+    
+    // Nếu bạn còn các gói controller khác ở 'controllers.allocation', hãy giữ nguyên:
+    opens itss.group11.controllers.allocation to javafx.fxml, spring.core, spring.beans, spring.context;
 
-    exports itss.group11;
+    // 4. Cho phép JavaFX khởi chạy App và quản lý Stage
+    opens itss.group11.frontend to javafx.fxml;
+    opens itss.group11.frontend.stage to javafx.fxml;
+
+    // --- EXPORTS ---
+    exports itss.group11.frontend;
 }
