@@ -1,0 +1,33 @@
+package itss.group11.repository.allocation;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import itss.group11.dto.allocation.SiteStockDTO;
+import itss.group11.models.ImportSite;
+
+@Repository
+public interface ImportSiteRepository extends JpaRepository<ImportSite, String> {
+    
+    Optional<ImportSite> findBySiteCode(String siteCode);
+
+    /**
+     * Truy vấn PostgreSQL tính tổng số lượng tồn kho của một mặt hàng trên toàn bộ hệ thống các Site
+     */
+    @Query(value = "SELECT COALESCE(SUM(in_stock_quantity), 0) FROM site_inventory WHERE merchandise_code = :merchandiseCode", nativeQuery = true)
+    int calculateTotalStockByItem(@Param("merchandiseCode") String merchandiseCode);
+
+    /**
+     * Truy vấn lấy danh sách chi tiết tồn kho của mặt hàng tại từng Site cụ thể, map trực tiếp vào DTO
+     */
+    @Query(value = "SELECT new itss.group11.dto.allocation.SiteStockDTO(s.siteCode, s.siteName, si.merchandise.code, si.inStockQuantity) " +
+                   "FROM SiteInventory si JOIN si.importSite s " +
+                   "WHERE si.merchandise.code = :merchandiseCode AND si.inStockQuantity > 0 " +
+                   "ORDER BY si.inStockQuantity DESC")
+    List<SiteStockDTO> findStockDetailsByItem(@Param("merchandiseCode") String merchandiseCode);
+}
