@@ -1,12 +1,28 @@
 package itss.group11.models;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "purchase_order_line")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class PurchaseOrderLine {
 
@@ -15,7 +31,7 @@ public class PurchaseOrderLine {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "po_id", referencedColumnName = "order_id", nullable = false)
     private PurchaseOrder purchaseOrder;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -23,24 +39,23 @@ public class PurchaseOrderLine {
     private Merchandise merchandise;
 
     @Column(name = "ordered_qty", nullable = false)
-    private Integer orderedQty;         // Số lượng đặt
+    private Integer orderedQty;
 
     @Column(name = "received_qty")
-    private Integer receivedQty;        // Số lượng thực nhận (sau khi kho nhập)
+    private Integer receivedQty;
 
     @Column(name = "unit", length = 50)
     private String unit;
 
     @Column(name = "delivery_means", length = 20)
     @Enumerated(EnumType.STRING)
-    private DeliveryMeans deliveryMeans; // Phương thức vận chuyển
+    private DeliveryMeans deliveryMeans;
 
     public enum DeliveryMeans {
-        SHIP,   // Tàu
-        AIR     // Hàng không
+        SHIP,
+        AIR
     }
 
-    // Tính chênh lệch số lượng (dùng cho đối soát - UC006)
     public int calculateDifference() {
         if (receivedQty == null) return orderedQty;
         return orderedQty - receivedQty;

@@ -1,14 +1,29 @@
 package itss.group11.models;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "order_request_item")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class OrderRequestItem {
 
@@ -25,11 +40,11 @@ public class OrderRequestItem {
     private Merchandise merchandise;
 
     @Column(name = "quantity_ordered", nullable = false)
-    private Integer quantityOrdered;    // Số lượng cần đặt
+    private Integer quantityOrdered;
 
-    @Column(name = "unit", length = 50)
-    private String unit;                // Đơn vị
+    @Transient
+    private String unit;
 
-    @Column(name = "desired_delivery_date", nullable = false)
-    private LocalDate desiredDeliveryDate;  // Ngày nhận mong muốn
+    @Transient
+    private LocalDate desiredDeliveryDate;
 }

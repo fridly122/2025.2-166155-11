@@ -1,43 +1,113 @@
 module itss.group11 {
-    // --- REQUIRES ---
+
+    // Java core
+    requires java.net.http;
+    requires java.sql;
+
+    // JavaFX
     requires javafx.controls;
     requires javafx.fxml;
-    
-    requires java.sql;
+
+    // Jackson
+    requires com.fasterxml.jackson.databind;
+
+    // JPA / Hibernate
     requires jakarta.persistence;
-    requires org.hibernate.orm.core; 
-    
-    requires spring.boot.starter.data.jpa; // Gộp chung nếu cần thiết
-    requires spring.data.jpa;
-    requires spring.data.commons; 
+    requires org.hibernate.orm.core;
+
+    // PostgreSQL JDBC Driver
+    requires org.postgresql.jdbc;
+
+    // Spring
+    requires spring.boot;
+    requires spring.boot.autoconfigure;
     requires spring.context;
     requires spring.beans;
+    requires spring.core;
     requires spring.tx;
     requires spring.web;
+    requires spring.aop;
+    requires spring.data.jpa;
+    requires spring.data.commons;
 
+    // Other
     requires java.dotenv;
-    requires lombok;
+    requires static lombok;
 
-    // --- OPENS (CẤU HÌNH ĐỂ SPRING/JAVAFX HOẠT ĐỘNG) ---
-    
-    // 1. Cho phép Hibernate và Spring truy cập các Entity (Models)
-    opens itss.group11.models to org.hibernate.orm.core, spring.core, spring.beans;
-    
-    // 2. Cho phép Spring quản lý các Repository và Service
-    opens itss.group11.repository.allocation to spring.core, spring.beans, spring.context;
-    opens itss.group11.services.allocation to spring.core, spring.beans, spring.context;
+    // Spring Boot entry point
+    opens itss.group11 to spring.core, spring.beans, spring.context;
 
-    // 3. CẤU HÌNH CONTROLLER (ĐÃ SỬA: Thêm đường dẫn đúng tới DashboardController)
-    // Mở gói chứa các Controller cho Spring và JavaFX
-    opens itss.group11.frontend.screens.dashboard to javafx.fxml, spring.core, spring.beans, spring.context;
-    
-    // Nếu bạn còn các gói controller khác ở 'controllers.allocation', hãy giữ nguyên:
-    opens itss.group11.controllers.allocation to javafx.fxml, spring.core, spring.beans, spring.context;
+    // Models cho Hibernate / JPA / Spring reflection
+    opens itss.group11.models to
+            org.hibernate.orm.core,
+            spring.core,
+            spring.beans,
+            spring.context,
+            com.fasterxml.jackson.databind;
 
-    // 4. Cho phép JavaFX khởi chạy App và quản lý Stage
-    opens itss.group11.frontend to javafx.fxml;
+    // DTO cho Jackson / Spring
+    opens itss.group11.dto.allocation to
+            com.fasterxml.jackson.databind,
+            spring.core,
+            spring.beans,
+            spring.context;
+
+    exports itss.group11.dto.allocation to
+            org.hibernate.orm.core;
+
+    // Repository packages
+    opens itss.group11.repository.allocation to
+            spring.core,
+            spring.beans,
+            spring.context,
+            spring.data.commons,
+            spring.data.jpa;
+
+    opens itss.group11.repository.orderExecution to
+            spring.core,
+            spring.beans,
+            spring.context,
+            spring.data.commons,
+            spring.data.jpa;
+
+    opens itss.group11.repository.requestManage to
+            spring.core,
+            spring.beans,
+            spring.context,
+            spring.data.commons,
+            spring.data.jpa;
+
+    // Service packages
+    opens itss.group11.services.allocation to
+            spring.core,
+            spring.beans,
+            spring.context,
+            spring.aop;
+
+    // Spring REST Controller
+    opens itss.group11.controllers.allocation to
+            spring.core,
+            spring.beans,
+            spring.context,
+            spring.web;
+
+    // JavaFX App / Controllers
+    opens itss.group11.frontend to
+            javafx.fxml,
+            spring.core,
+            spring.beans,
+            spring.context;
+
     opens itss.group11.frontend.stage to javafx.fxml;
 
-    // --- EXPORTS ---
+    opens itss.group11.frontend.screens.dashboard to javafx.fxml;
+    opens itss.group11.frontend.screens.allocationList to javafx.fxml;
+    opens itss.group11.frontend.screens.allocationDetail to javafx.fxml;
+    opens itss.group11.frontend.screens.siteClassification to javafx.fxml;
+    opens itss.group11.frontend.screens.orderReconciliation to javafx.fxml;
+    opens itss.group11.frontend.screens.orderRequestCreate to javafx.fxml;
+    opens itss.group11.frontend.screens.siteShippingManage to javafx.fxml;
+
+    // Export App
     exports itss.group11.frontend;
 }

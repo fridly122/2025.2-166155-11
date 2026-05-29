@@ -9,6 +9,9 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import itss.group11.dto.allocation.AllocationPlanDTO;
+import itss.group11.dto.allocation.AllocationPlanItemDTO;
+import itss.group11.dto.allocation.AllocationRequestRowDTO;
 import itss.group11.dto.allocation.AllocationResultDTO;
 import itss.group11.dto.allocation.SiteStockDTO;
 import itss.group11.models.ImportSite;
@@ -29,89 +32,133 @@ public class AllocationService {
     private final OrderRequestRepository orderRequestRepository;
     private final ImportSiteRepository importSiteRepository;
     private final PurchaseOrderRepository purchaseOrderRepository;
-    private final InventoryCheckService inventoryCheckService; 
+    private final InventoryCheckService inventoryCheckService;
 
-    /**
-     * Hàm chính xử lý lập kế hoạch đặt hàng (UC005)
-     */
-    @Transactional
-    public AllocationResultDTO processAllocationPlan(String requestCode) {
-        // 1. Lấy thông tin yêu cầu
-        OrderRequest request = orderRequestRepository.findByRequestCode(requestCode)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu nhập hàng: " + requestCode));
+    @Transactional(readOnly = true)
+    public List<AllocationRequestRowDTO> getPendingRequests() {
+        return orderRequestRepository
+                .findByStatusOrderByCreatedAtDesc(OrderRequest.OrderRequestStatus.PENDING)
+                .stream()
+                .map(request -> AllocationRequestRowDTO.builder()
+                        .requestCode(request.getRequestCode())
+                        .status(request.getStatus().name())
+                        .createdDate(request.getCreatedAt() == null ? "" : request.getCreatedAt().toLocalDate().toString())
+                        .build())
+                .toList();
+    }
 
-        if (request.getStatus() != OrderRequest.OrderRequestStatus.PENDING) {
-            throw new RuntimeException("Yêu cầu này đã được xử lý!");
+    @Transactional(readOnly = true)
+    public AllocationPlanDTO previewAllocationPlan(String requestCode) {
+        OrderRequest request = findPendingRequest(requestCode);
+
+        List<AllocationPlanItemDTO> planItems = new ArrayList<>();
+        boolean isStockEnough = true;
+
+        for (OrderRequestItem reqItem : request.getItems()) {
+            Merchandise merchandise = reqItem.getMerchandise();
+            int remainingQty = reqItem.getQuantityOrdered();
+
+            List<SiteStockDTO> availableStocks =
+                    inventoryCheckService.getStockDetailsAcrossSites(merchandise.getCode());
+
+            for (SiteStockDTO stock : availableStocks) {
+                if (remainingQty <= 0) break;
+
+                int qtyToAllocate = Math.min(remainingQty, stock.getInStockQuantity());
+                remainingQty -= qtyToAllocate;
+
+                planItems.add(AllocationPlanItemDTO.builder()
+                        .merchandiseCode(merchandise.getCode())
+                        .siteCode(stock.getSiteCode())
+                        .siteName(stock.getSiteName())
+                        .allocatedQuantity(qtyToAllocate)
+                        .build());
+            }
+
+            if (remainingQty > 0) {
+                isStockEnough = false;
+            }
         }
 
-        // 2. Kịch bản kiểm tra tồn kho tổng
-        boolean isStockEnough = checkInventoryFromSites(request);
+        return AllocationPlanDTO.builder()
+                .requestCode(requestCode)
+                .isEnoughInventory(isStockEnough)
+                .planItems(planItems)
+                .message(isStockEnough ? "Kế hoạch khả thi." : "Cảnh báo: Không đủ tồn kho!")
+                .build();
+    }
 
-        if (!isStockEnough) {
+    @Transactional
+    public AllocationResultDTO processAllocationPlan(String requestCode) {
+        OrderRequest request = findPendingRequest(requestCode);
+
+        if (!checkInventoryFromSites(request)) {
             throw new RuntimeException("INSUFFICIENT_INVENTORY");
         }
 
-        // 3. Thực thi thuật toán phân bổ đa Site và tạo các PO
         List<String> poCodes = executeOptimalAllocationAndCreatePO(request);
 
-        // 4. Cập nhật trạng thái
         request.setStatus(OrderRequest.OrderRequestStatus.ORDERED);
         orderRequestRepository.save(request);
 
         return AllocationResultDTO.builder()
                 .requestCode(requestCode)
                 .isSuccess(true)
-                .message("Phân bổ thành công! Đã lên kế hoạch mua hàng.")
+                .message("Phân bổ thành công! Đã tạo " + poCodes.size() + " đơn PO.")
                 .generatedPoCodes(poCodes)
                 .build();
     }
 
-    /**
-     * Kiểm tra tồn kho THẬT từ Database
-     */
+    private OrderRequest findPendingRequest(String requestCode) {
+        OrderRequest request = orderRequestRepository.findByRequestCode(requestCode)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu nhập hàng: " + requestCode));
+
+        if (request.getStatus() != OrderRequest.OrderRequestStatus.PENDING) {
+            throw new RuntimeException("Yêu cầu này không ở trạng thái PENDING.");
+        }
+
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new RuntimeException("Yêu cầu nhập hàng chưa có mặt hàng.");
+        }
+
+        return request;
+    }
+
     private boolean checkInventoryFromSites(OrderRequest request) {
         for (OrderRequestItem reqItem : request.getItems()) {
             String merchandiseCode = reqItem.getMerchandise().getCode();
             int requiredQty = reqItem.getQuantityOrdered();
 
             if (!inventoryCheckService.isStockSufficient(merchandiseCode, requiredQty)) {
-                return false; 
+                return false;
             }
         }
-        return true; 
+        return true;
     }
 
-    /**
-     * Thuật toán phân bổ và sinh đơn Purchase Order theo từng Site
-     */
     private List<String> executeOptimalAllocationAndCreatePO(OrderRequest request) {
         List<String> generatedPoCodes = new ArrayList<>();
-        
-        // Dùng Map để gom nhóm các PO theo từng Site (Key: siteCode, Value: PurchaseOrder)
         Map<String, PurchaseOrder> poGroupedBySite = new HashMap<>();
 
-        // Duyệt qua từng mặt hàng cần đặt
         for (OrderRequestItem reqItem : request.getItems()) {
             Merchandise merchandise = reqItem.getMerchandise();
             int remainingQtyToFulfill = reqItem.getQuantityOrdered();
 
-            // Lấy danh sách tồn kho của mặt hàng này (đã sort giảm dần số lượng từ DB)
-            List<SiteStockDTO> availableStocks = inventoryCheckService.getStockDetailsAcrossSites(merchandise.getCode());
+            List<SiteStockDTO> availableStocks =
+                    inventoryCheckService.getStockDetailsAcrossSites(merchandise.getCode());
 
             for (SiteStockDTO stock : availableStocks) {
-                if (remainingQtyToFulfill <= 0) break; // Đã gom đủ số lượng cho mặt hàng này
+                if (remainingQtyToFulfill <= 0) break;
 
-                // Tính toán số lượng có thể lấy từ Site hiện tại
                 int qtyToAllocate = Math.min(remainingQtyToFulfill, stock.getInStockQuantity());
-                remainingQtyToFulfill -= qtyToAllocate; // Trừ đi phần vừa phân bổ
+                remainingQtyToFulfill -= qtyToAllocate;
 
                 String siteCode = stock.getSiteCode();
-                
-                // Lấy PO của Site này ra (nếu chưa có thì tạo mới và ném vào Map)
+
                 PurchaseOrder sitePo = poGroupedBySite.computeIfAbsent(siteCode, key -> {
                     ImportSite site = importSiteRepository.findBySiteCode(key)
                             .orElseThrow(() -> new RuntimeException("Không tìm thấy Site cấu hình: " + key));
-                    
+
                     return PurchaseOrder.builder()
                             .orderId(generateUniquePoCode())
                             .orderRequest(request)
@@ -121,23 +168,22 @@ public class AllocationService {
                             .build();
                 });
 
-                // Tạo line item mới và add vào PO của Site tương ứng
                 PurchaseOrderLine poLine = PurchaseOrderLine.builder()
                         .purchaseOrder(sitePo)
                         .merchandise(merchandise)
                         .orderedQty(qtyToAllocate)
+                        .receivedQty(0)
+                        .unit(merchandise.getUnit())
                         .build();
-                
+
                 sitePo.getOrderLines().add(poLine);
             }
 
-            // Chốt chặn an toàn (bước checkInventory đã cover, nhưng vẫn nên có)
             if (remainingQtyToFulfill > 0) {
-                throw new RuntimeException("Lỗi Logic hệ thống: Không thể phân bổ đủ hàng cho " + merchandise.getCode());
+                throw new RuntimeException("Không đủ hàng cho mặt hàng: " + merchandise.getCode());
             }
         }
 
-        // Lưu toàn bộ các đơn Purchase Order đã phân bổ xuống Database
         for (PurchaseOrder completedPo : poGroupedBySite.values()) {
             purchaseOrderRepository.save(completedPo);
             generatedPoCodes.add(completedPo.getOrderId());
@@ -147,6 +193,10 @@ public class AllocationService {
     }
 
     private String generateUniquePoCode() {
-        return "DH-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        String poCode;
+        do {
+            poCode = "DH-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        } while (purchaseOrderRepository.existsByOrderId(poCode));
+        return poCode;
     }
 }

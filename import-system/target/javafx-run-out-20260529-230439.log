@@ -1,0 +1,52 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.3)
+
+2026-05-29T23:04:57.547+07:00  INFO 12340 --- [JavaFX-Launcher] o.s.boot.SpringApplication               : Starting application using Java 24.0.1 with PID 12340 (started by ADMIN in G:\hieu\ITSS Project\import-system)
+2026-05-29T23:04:57.578+07:00  INFO 12340 --- [JavaFX-Launcher] o.s.boot.SpringApplication               : No active profile set, falling back to 1 default profile: "default"
+2026-05-29T23:05:00.781+07:00  INFO 12340 --- [JavaFX-Launcher] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-29T23:05:01.379+07:00  INFO 12340 --- [JavaFX-Launcher] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 518 ms. Found 3 JPA repository interfaces.
+2026-05-29T23:05:03.644+07:00  INFO 12340 --- [JavaFX-Launcher] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-05-29T23:05:03.698+07:00  INFO 12340 --- [JavaFX-Launcher] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-29T23:05:03.700+07:00  INFO 12340 --- [JavaFX-Launcher] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2026-05-29T23:05:03.886+07:00  INFO 12340 --- [JavaFX-Launcher] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-29T23:05:03.888+07:00  INFO 12340 --- [JavaFX-Launcher] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 6047 ms
+2026-05-29T23:05:05.138+07:00  INFO 12340 --- [JavaFX-Launcher] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-29T23:05:05.388+07:00  INFO 12340 --- [JavaFX-Launcher] org.hibernate.Version                    : HHH000412: Hibernate ORM core version [WORKING]
+2026-05-29T23:05:05.490+07:00  INFO 12340 --- [JavaFX-Launcher] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-29T23:05:06.783+07:00  INFO 12340 --- [JavaFX-Launcher] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-29T23:05:06.871+07:00  INFO 12340 --- [JavaFX-Launcher] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-29T23:05:09.196+07:00  INFO 12340 --- [JavaFX-Launcher] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-29T23:05:10.733+07:00  INFO 12340 --- [JavaFX-Launcher] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-05-29T23:05:14.176+07:00  INFO 12340 --- [JavaFX-Launcher] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-29T23:05:14.183+07:00  INFO 12340 --- [JavaFX-Launcher] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-29T23:05:16.053+07:00  INFO 12340 --- [JavaFX-Launcher] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-29T23:05:21.205+07:00  INFO 12340 --- [JavaFX-Launcher] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-05-29T23:05:21.238+07:00  INFO 12340 --- [JavaFX-Launcher] o.s.boot.SpringApplication               : Started application in 25.426 seconds (process running for 28.989)
+2026-05-29T23:05:21.507+07:00  INFO 12340 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-29T23:05:21.507+07:00  INFO 12340 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-29T23:05:21.511+07:00  INFO 12340 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-05-29T23:05:24.056+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnCreateRequest, styleClass=button]'Tạo yêu cầu nhập hàng'
+2026-05-29T23:05:24.123+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnCreateRequest, styleClass=button]'Tạo yêu cầu nhập hàng'
+2026-05-29T23:05:24.126+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnClassification, styleClass=button]'Tìm Site & Phân loại'
+2026-05-29T23:05:24.131+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnClassification, styleClass=button]'Tìm Site & Phân loại'
+2026-05-29T23:05:24.134+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnShipping, styleClass=button]'Quản lý vận chuyển Site'
+2026-05-29T23:05:24.138+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnShipping, styleClass=button]'Quản lý vận chuyển Site'
+2026-05-29T23:05:24.141+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnAllocation, styleClass=button]'Lập kế hoạch đặt hàng'
+2026-05-29T23:05:24.147+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnAllocation, styleClass=button]'Lập kế hoạch đặt hàng'
+2026-05-29T23:05:24.149+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnReconciliation, styleClass=button]'Đối soát & Nhập kho'
+2026-05-29T23:05:24.153+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnReconciliation, styleClass=button]'Đối soát & Nhập kho'
+2026-05-29T23:05:25.209+07:00  WARN 12340 --- [lication Thread] javafx.css                               : Caught java.lang.IllegalArgumentException: No enum constant javafx.geometry.Pos.LEFT' while calculating value for '-fx-alignment' from inline style on Button[id=btnCreateRequest, styleClass=button]'Tạo yêu cầu nhập hàng'

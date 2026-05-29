@@ -58,7 +58,7 @@ public class DashboardController {
 
     // Các hàm bắt sự kiện menu - Hãy cập nhật lại đường dẫn cho chuẩn
     @FXML private void handleNavCreateRequest() {
-        loadSubScreen("/itss/group11orderRequestCreate/orderRequestCreate.fxml");
+        loadSubScreen("/itss/group11/orderRequestCreate/orderRequestCreate.fxml");
     }
 
     @FXML private void handleNavClassification() {

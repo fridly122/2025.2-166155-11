@@ -34,7 +34,7 @@ public class PurchaseOrder {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseOrderLine> orderLines;
     public enum PurchaseOrderStatus {
         CREATED,            // Vừa tạo

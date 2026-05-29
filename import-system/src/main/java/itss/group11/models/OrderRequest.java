@@ -15,6 +15,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,38 +24,39 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "order_request")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class OrderRequest {
 
     @Id
     @Column(name = "request_code", length = 50)
-    private String requestCode;         // Mã yêu cầu (VD: "YC-BH-002")
+    private String requestCode;
 
     @Column(name = "status", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
-    private OrderRequestStatus status;  // Trạng thái
+    private OrderRequestStatus status;
 
     @Column(name = "desired_delivery_date")
-    private LocalDate desiredDeliveryDate; // Ngày nhận mong muốn từ BP Bán Hàng (Bổ sung)
+    private LocalDate desiredDeliveryDate;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "created_by", length = 100)
-    private String createdBy;           // Nhân viên bán hàng tạo yêu cầu
+    @Transient
+    private String createdBy;
 
-    // Danh sách mặt hàng trong yêu cầu này
     @OneToMany(mappedBy = "orderRequest", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderRequestItem> items;
 
     public enum OrderRequestStatus {
-        PENDING,        // Chờ xử lý
-        PROCESSING,     // Đang xử lý
-        ORDERED,        // Đã đặt hàng
-        COMPLETED,      // Hoàn thành
-        CANCELLED       // Đã hủy
+        PENDING,
+        PROCESSING,
+        ORDERED,
+        COMPLETED,
+        CANCELLED
     }
 }

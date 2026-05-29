@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllocationPlanDTO {
+public class AllocationRequestRowDTO {
     private String requestCode;
-    private boolean isEnoughInventory; // true: Đủ hàng, false: Bị thiếu hàng
-    private String message;
-    private List<AllocationPlanItemDTO> planItems;
+    private String status;
+    private String createdDate;
 }

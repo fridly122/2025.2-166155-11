@@ -1,33 +1,47 @@
 package itss.group11.frontend;
 
+import itss.group11.ImportSystemBackendApplication;
 import itss.group11.frontend.stage.StageManager;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * JavaFX App - Điểm khởi chạy chính của phần mềm hệ thống Nhóm 11
+ * JavaFX entry point. It also starts the embedded Spring Boot backend so
+ * allocationList can call http://localhost:8080 from inside the same desktop app.
  */
 public class App extends Application {
 
+    private ConfigurableApplicationContext springContext;
+
+    @Override
+    public void init() {
+        springContext = ImportSystemBackendApplication.run();
+    }
+
     @Override
     public void start(Stage primaryStage) {
-        // 1. Giao quyền quản lý cửa sổ chính (Primary Stage) cho hệ thống StageManager dùng chung
         StageManager.setPrimaryStage(primaryStage);
-        
-        // 2. Thiết lập kích thước tối thiểu để giao diện không bị co rúm, vỡ layout
+
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
 
-        // 3. Khởi chạy màn hình đầu tiên khi vừa bật App
-        // Ở đây chúng ta trỏ thẳng vào màn hình chức năng của bạn (UC005) để tiện test code
         StageManager.switchScene(
-            "/itss/group11/dashboard/dashboard.fxml", 
-            "Hệ thống Đặt hàng Nhập khẩu - Nhóm 11"
+                "/itss/group11/dashboard/dashboard.fxml",
+                "He thong Dat hang Nhap khau - Nhom 11"
         );
     }
 
+    @Override
+    public void stop() {
+        if (springContext != null) {
+            springContext.close();
+        }
+        Platform.exit();
+    }
+
     public static void main(String[] args) {
-        // Kích hoạt ứng dụng JavaFX
         launch(args);
     }
 }

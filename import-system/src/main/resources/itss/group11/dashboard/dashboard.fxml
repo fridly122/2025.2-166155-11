@@ -30,19 +30,19 @@
             <Separator prefWidth="200.0" style="-fx-opacity: 0.3;" />
             
             <Button fx:id="btnCreateRequest" mnemonicParsing="false" onAction="#handleNavCreateRequest" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="1. Tạo yêu cầu nhập hàng (Nguyên)" />
+                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="Tạo yêu cầu nhập hàng" />
             
             <Button fx:id="btnClassification" mnemonicParsing="false" onAction="#handleNavClassification" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="2. Tìm Site &amp; Phân loại (Hòa/Tài)" />
+                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="Tìm Site &amp; Phân loại" />
             
             <Button fx:id="btnShipping" mnemonicParsing="false" onAction="#handleNavShipping" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="3. Quản lý vận chuyển Site (Nhật)" />
+                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="Quản lý vận chuyển Site" />
             
             <Button fx:id="btnAllocation" mnemonicParsing="false" onAction="#handleNavAllocation" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-alignment: LEFT; -fx-font-weight: bold;" text="4. Lập kế hoạch đặt hàng (Hiếu)" />
+                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-alignment: LEFT; -fx-font-weight: bold;" text="Lập kế hoạch đặt hàng" />
             
             <Button fx:id="btnReconciliation" mnemonicParsing="false" onAction="#handleNavReconciliation" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="5. Đối soát &amp; Nhập kho (C.Anh)" />
+                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="Đối soát &amp; Nhập kho" />
          </children>
       </VBox>
    </left>

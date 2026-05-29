@@ -1,0 +1,9 @@
+Exception in thread "main" java.lang.NoClassDefFoundError: kotlin/jvm/internal/Intrinsics
+	at java.dotenv@5.2.2/io.github.cdimascio.dotenv.internal.DotenvReader.<init>(DotenvReader.kt)
+	at java.dotenv@5.2.2/io.github.cdimascio.dotenv.DotenvBuilder.load(Dotenv.kt:121)
+	at itss.group11/itss.group11.ImportSystemBackendApplication.run(ImportSystemBackendApplication.java:20)
+	at itss.group11/itss.group11.ImportSystemBackendApplication.main(ImportSystemBackendApplication.java:14)
+Caused by: java.lang.ClassNotFoundException: kotlin.jvm.internal.Intrinsics
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:580)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490)
+	... 4 more
