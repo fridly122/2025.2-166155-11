@@ -13,10 +13,8 @@ import itss.group11.models.OrderRequest;
 public interface OrderRequestRepository extends JpaRepository<OrderRequest, String> {
 
     Optional<OrderRequest> findByRequestCode(String requestCode);
-    List<OrderRequest> findByStatusOrderByCreatedAtDesc(OrderRequest.OrderRequestStatus status);
     List<OrderRequest> findByStatusOrderByCreatedAtAsc(OrderRequest.OrderRequestStatus status);
     List<OrderRequest> findByStatusOrderByDesiredDeliveryDateAscCreatedAtAsc(OrderRequest.OrderRequestStatus status);
-    List<OrderRequest> findAllByOrderByCreatedAtDesc();
     List<OrderRequest> findAllByOrderByCreatedAtAsc();
 
     @Query("select r.requestCode from OrderRequest r")

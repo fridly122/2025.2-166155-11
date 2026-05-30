@@ -17,6 +17,7 @@ import itss.group11.dto.orderExecution.ReceivedLineDTO;
 import itss.group11.dto.orderExecution.ReconciliationDetailDTO;
 import itss.group11.dto.orderExecution.ReconciliationResultDTO;
 import itss.group11.dto.orderExecution.ReconciliationSubmitDTO;
+import itss.group11.frontend.ApiConfig;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -92,7 +93,7 @@ public class OrderReconciliationController {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String BASE_URL = "http://localhost:8080/api/v1/purchase-orders";
+    private static final String BASE_URL = ApiConfig.baseUrl("/api/v1/purchase-orders");
 
     @FXML
     public void initialize() {

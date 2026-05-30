@@ -14,6 +14,7 @@ import itss.group11.dto.requestManage.MerchandiseOptionDTO;
 import itss.group11.dto.requestManage.OrderRequestCreationDTO;
 import itss.group11.dto.requestManage.OrderRequestDetailDTO;
 import itss.group11.dto.requestManage.OrderRequestSummaryDTO;
+import itss.group11.frontend.ApiConfig;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -81,7 +82,7 @@ public class OrderRequestCreateController {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ObservableList<RequestItemRow> requestItems = FXCollections.observableArrayList();
 
-    private static final String BASE_URL = "http://localhost:8080/api/v1/order-requests";
+    private static final String BASE_URL = ApiConfig.baseUrl("/api/v1/order-requests");
 
     @FXML
     public void initialize() {

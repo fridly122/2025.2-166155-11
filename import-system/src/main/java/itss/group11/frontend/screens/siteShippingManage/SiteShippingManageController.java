@@ -13,6 +13,7 @@ import itss.group11.dto.transport.PendingPurchaseOrderDTO;
 import itss.group11.dto.transport.TransportCreateDTO;
 import itss.group11.dto.transport.TransportDetailDTO;
 import itss.group11.dto.transport.TransportUpdateDTO;
+import itss.group11.frontend.ApiConfig;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -52,7 +53,7 @@ public class SiteShippingManageController {
     private TextField txtDestinationSite;
 
     @FXML
-    private TextField txtVehicle;
+    private ComboBox<String> cboVehicle;
 
     @FXML
     private Spinner<Integer> spnDeliveryDays;
@@ -94,7 +95,7 @@ public class SiteShippingManageController {
     private TextField txtEditDestinationSite;
 
     @FXML
-    private TextField txtEditVehicle;
+    private ComboBox<String> cboEditVehicle;
 
     @FXML
     private Spinner<Integer> spnEditDeliveryDays;
@@ -111,7 +112,10 @@ public class SiteShippingManageController {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String BASE_URL = "http://localhost:8080/api/v1/transports";
+    private static final String BASE_URL = ApiConfig.baseUrl("/api/v1/transports");
+    private static final String VEHICLE_AIR = "AIR";
+    private static final String VEHICLE_SHIP = "SHIP";
+    private static final String VEHICLE_TRUCK = "TRUCK";
 
     @FXML
     public void initialize() {
@@ -121,6 +125,9 @@ public class SiteShippingManageController {
         pendingOrderTable.setPlaceholder(new Label("Không có đơn hàng CREATED chờ vận chuyển."));
         transportTable.setPlaceholder(new Label("Chưa có thông tin vận chuyển."));
 
+        cboVehicle.setItems(FXCollections.observableArrayList(VEHICLE_AIR, VEHICLE_SHIP, VEHICLE_TRUCK));
+        cboEditVehicle.setItems(FXCollections.observableArrayList(VEHICLE_AIR, VEHICLE_SHIP, VEHICLE_TRUCK));
+        cboVehicle.getSelectionModel().select(VEHICLE_AIR);
         cboTransportStatus.setItems(FXCollections.observableArrayList("IN_TRANSIT", "COMPLETED", "CANCELLED"));
 
         btnCreateTransport.disableProperty().bind(
@@ -152,7 +159,7 @@ public class SiteShippingManageController {
         }
 
         String destinationSite = txtDestinationSite.getText();
-        String vehicle = txtVehicle.getText();
+        String vehicle = cboVehicle.getSelectionModel().getSelectedItem();
         Integer deliveryDays = spnDeliveryDays.getValue();
 
         if (destinationSite == null || destinationSite.isBlank()) {
@@ -220,7 +227,7 @@ public class SiteShippingManageController {
         TransportRow selected = transportTable.getSelectionModel().getSelectedItem();
         String newStatus = cboTransportStatus.getSelectionModel().getSelectedItem();
         String destinationSite = txtEditDestinationSite.getText();
-        String vehicle = txtEditVehicle.getText();
+        String vehicle = cboEditVehicle.getSelectionModel().getSelectedItem();
         Integer deliveryDays = spnEditDeliveryDays.getValue();
 
         if (selected == null) {
@@ -414,7 +421,7 @@ public class SiteShippingManageController {
         if (selected == null) {
             lblSelectedTransport.setText("Chưa chọn thông tin vận chuyển");
             txtEditDestinationSite.clear();
-            txtEditVehicle.clear();
+            cboEditVehicle.getSelectionModel().clearSelection();
             spnEditDeliveryDays.getValueFactory().setValue(1);
             cboTransportStatus.getSelectionModel().clearSelection();
             return;
@@ -426,17 +433,31 @@ public class SiteShippingManageController {
                         + " -> " + selected.getDestinationSite()
         );
         txtEditDestinationSite.setText(selected.getDestinationSite());
-        txtEditVehicle.setText(selected.getVehicle());
+        selectVehicle(cboEditVehicle, selected.getVehicle());
         spnEditDeliveryDays.getValueFactory().setValue(Math.max(1, selected.getDeliveryDays()));
         cboTransportStatus.getSelectionModel().select(selected.getTransportStatus());
     }
 
     private void clearCreateForm() {
         txtDestinationSite.clear();
-        txtVehicle.clear();
+        cboVehicle.getSelectionModel().select(VEHICLE_AIR);
         spnDeliveryDays.getValueFactory().setValue(1);
         pendingOrderTable.getSelectionModel().clearSelection();
         lblSelectedOrder.setText("Chưa chọn đơn hàng");
+    }
+
+    private void selectVehicle(ComboBox<String> comboBox, String vehicle) {
+        if (vehicle == null || vehicle.isBlank()) {
+            comboBox.getSelectionModel().clearSelection();
+            return;
+        }
+
+        String normalizedVehicle = vehicle.trim().toUpperCase();
+        if (comboBox.getItems().contains(normalizedVehicle)) {
+            comboBox.getSelectionModel().select(normalizedVehicle);
+        } else {
+            comboBox.getSelectionModel().clearSelection();
+        }
     }
 
     private void showInfo(String title, String content) {

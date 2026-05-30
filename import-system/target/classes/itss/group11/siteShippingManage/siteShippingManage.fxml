@@ -85,10 +85,10 @@
                                                                    GridPane.rowIndex="0"/>
 
                                                         <Label text="Phương tiện:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                                        <TextField fx:id="txtVehicle"
-                                                                   promptText="VD: Máy bay, Tàu biển, Xe tải"
-                                                                   GridPane.columnIndex="1"
-                                                                   GridPane.rowIndex="1"/>
+                                                        <ComboBox fx:id="cboVehicle"
+                                                                  prefWidth="180.0"
+                                                                  GridPane.columnIndex="1"
+                                                                  GridPane.rowIndex="1"/>
 
                                                         <Label text="Số ngày vận chuyển:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                                                         <Spinner fx:id="spnDeliveryDays"
@@ -157,10 +157,10 @@
                                                                    GridPane.rowIndex="0"/>
 
                                                         <Label text="Phương tiện:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                                                        <TextField fx:id="txtEditVehicle"
-                                                                   prefWidth="180.0"
-                                                                   GridPane.columnIndex="3"
-                                                                   GridPane.rowIndex="0"/>
+                                                        <ComboBox fx:id="cboEditVehicle"
+                                                                  prefWidth="180.0"
+                                                                  GridPane.columnIndex="3"
+                                                                  GridPane.rowIndex="0"/>
 
                                                         <Label text="Số ngày:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                                                         <Spinner fx:id="spnEditDeliveryDays"

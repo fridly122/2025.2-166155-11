@@ -15,4 +15,13 @@ public class SiteStockDTO {
     private String siteName;
     private String merchandiseCode;
     private int inStockQuantity;
+    private Integer daysByShip;
+    private Integer daysByAir;
+
+    public SiteStockDTO(String siteCode, String siteName, String merchandiseCode, int inStockQuantity) {
+        this.siteCode = siteCode;
+        this.siteName = siteName;
+        this.merchandiseCode = merchandiseCode;
+        this.inStockQuantity = inStockQuantity;
+    }
 }

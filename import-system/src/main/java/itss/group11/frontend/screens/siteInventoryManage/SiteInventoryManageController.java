@@ -13,6 +13,7 @@ import itss.group11.dto.requestManage.MerchandiseOptionDTO;
 import itss.group11.dto.warehouse.InventoryRowDTO;
 import itss.group11.dto.warehouse.InventoryUpdateDTO;
 import itss.group11.dto.warehouse.SiteOptionDTO;
+import itss.group11.frontend.ApiConfig;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -75,7 +76,7 @@ public class SiteInventoryManageController {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String BASE_URL = "http://localhost:8080/api/v1/warehouse";
+    private static final String BASE_URL = ApiConfig.baseUrl("/api/v1/warehouse");
 
     @FXML
     public void initialize() {

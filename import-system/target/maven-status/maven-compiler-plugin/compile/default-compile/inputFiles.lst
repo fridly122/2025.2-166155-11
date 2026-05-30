@@ -1,4 +1,3 @@
-G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\config\DatabaseConnection.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controllers\allocation\AllocationController.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controllers\orderExecution\PurchaseOrderController.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controllers\requestManage\OrderRequestController.java
@@ -30,15 +29,12 @@ G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\transport\Tran
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\transport\TransportDetailDTO.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\transport\TransportStatusUpdateDTO.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\transport\TransportUpdateDTO.java
-G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\DiscrepancyReportDTO.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\InternalInventoryRowDTO.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\InventoryRowDTO.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\InventoryUpdateDTO.java
-G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\ReconciliationDetailDTO.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\SiteOptionDTO.java
-G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\WarehouseVerificationDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\ApiConfig.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\App.java
-G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\screens\allocationDetail\AllocationDetailController.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\screens\allocationList\AllocationListController.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\screens\dashboard\DashboardController.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\screens\login\LoginController.java
@@ -79,5 +75,4 @@ G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\services\requestMa
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\services\siteSync\SiteSyncService.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\services\transport\TransportService.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\services\warehouse\InventoryManagementService.java
-G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\services\warehouse\WarehouseReconciliationRepository.java
 G:\hieu\ITSS Project\import-system\src\main\java\module-info.java

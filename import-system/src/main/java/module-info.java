@@ -214,7 +214,6 @@ module itss.group11 {
     opens itss.group11.frontend.screens.login to javafx.fxml;
     opens itss.group11.frontend.screens.dashboard to javafx.fxml;
     opens itss.group11.frontend.screens.allocationList to javafx.fxml;
-    opens itss.group11.frontend.screens.allocationDetail to javafx.fxml;
     opens itss.group11.frontend.screens.siteClassification to javafx.fxml;
     opens itss.group11.frontend.screens.orderReconciliation to javafx.fxml;
     opens itss.group11.frontend.screens.orderRequestCreate to javafx.fxml;

@@ -9,7 +9,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * JavaFX entry point. It also starts the embedded Spring Boot backend so
- * allocationList can call http://localhost:8080 from inside the same desktop app.
+ * JavaFX screens call the embedded backend from inside the same desktop app.
  */
 public class App extends Application {
 
@@ -29,7 +29,7 @@ public class App extends Application {
 
         StageManager.switchScene(
                 "/itss/group11/login/login.fxml",
-                "Dang nhap - He thong Dat hang Nhap khau"
+                "Đăng nhập - Hệ thống Đặt hàng Nhập khẩu"
         );
     }
 

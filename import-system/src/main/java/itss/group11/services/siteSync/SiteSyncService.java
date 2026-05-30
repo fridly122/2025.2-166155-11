@@ -288,15 +288,15 @@ public class SiteSyncService {
     }
 
     private String suggestTransportMeans(ImportSite site) {
-        Integer daysByAir = site.getDaysByAir();
         Integer daysByShip = site.getDaysByShip();
-
-        if (daysByAir != null && (daysByShip == null || daysByAir <= daysByShip)) {
-            return "AIR";
-        }
+        Integer daysByAir = site.getDaysByAir();
 
         if (daysByShip != null) {
             return "SHIP";
+        }
+
+        if (daysByAir != null) {
+            return "AIR";
         }
 
         return "N/A";

@@ -13,4 +13,5 @@ public class AllocationPlanItemDTO {
     private String siteCode;
     private String siteName;
     private int allocatedQuantity;
+    private String deliveryMeans;
 }

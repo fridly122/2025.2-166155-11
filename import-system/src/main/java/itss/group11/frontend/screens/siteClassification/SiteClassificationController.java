@@ -16,6 +16,7 @@ import itss.group11.dto.requestManage.OrderRequestSummaryDTO;
 import itss.group11.dto.siteSync.InventoryInquirySendResultDTO;
 import itss.group11.dto.siteSync.OrderRequestClassificationDTO;
 import itss.group11.dto.siteSync.SiteClassificationResultDTO;
+import itss.group11.frontend.ApiConfig;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -102,7 +103,7 @@ public class SiteClassificationController {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String BASE_URL = "http://localhost:8080/api/v1/site-sync";
+    private static final String BASE_URL = ApiConfig.baseUrl("/api/v1/site-sync");
 
     @FXML
     public void initialize() {

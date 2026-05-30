@@ -72,6 +72,7 @@ public class AllocationService {
                         .siteCode(stock.getSiteCode())
                         .siteName(stock.getSiteName())
                         .allocatedQuantity(qtyToAllocate)
+                        .deliveryMeans(suggestDeliveryMeans(stock).name())
                         .build());
             }
 
@@ -174,6 +175,7 @@ public class AllocationService {
                         .orderedQty(qtyToAllocate)
                         .receivedQty(0)
                         .unit(merchandise.getUnit())
+                        .deliveryMeans(suggestDeliveryMeans(stock))
                         .build();
 
                 sitePo.getOrderLines().add(poLine);
@@ -198,5 +200,21 @@ public class AllocationService {
             poCode = "DH-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         } while (purchaseOrderRepository.existsByOrderId(poCode));
         return poCode;
+    }
+
+    private PurchaseOrderLine.DeliveryMeans suggestDeliveryMeans(SiteStockDTO stock) {
+        Integer daysByShip = stock.getDaysByShip();
+        Integer daysByAir = stock.getDaysByAir();
+
+        if (daysByShip != null) {
+            return PurchaseOrderLine.DeliveryMeans.SHIP;
+        }
+
+        if (daysByAir != null) {
+            return PurchaseOrderLine.DeliveryMeans.AIR;
+        }
+
+        throw new RuntimeException("Site " + stock.getSiteCode()
+                + " chua co du lieu ngay van chuyen bang AIR/SHIP.");
     }
 }

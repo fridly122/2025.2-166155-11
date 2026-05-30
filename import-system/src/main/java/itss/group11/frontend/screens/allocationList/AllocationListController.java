@@ -10,11 +10,11 @@ import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import itss.group11.dto.allocation.AllocationPlanDTO;
 import itss.group11.dto.allocation.AllocationPlanItemDTO;
 import itss.group11.dto.allocation.AllocationRequestRowDTO;
 import itss.group11.dto.allocation.AllocationResultDTO;
+import itss.group11.frontend.ApiConfig;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -49,12 +49,7 @@ public class AllocationListController {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final Dotenv DOTENV = Dotenv.configure()
-            .ignoreIfMissing()
-            .load();
-    private static final String DEFAULT_SERVER_PORT = "8080";
-    private static final String ALLOCATION_API_PATH = "/api/v1/allocations";
-    private static final String BASE_URL = resolveBaseUrl();
+    private static final String BASE_URL = ApiConfig.baseUrl("/api/v1/allocations");
 
     @FXML
     public void initialize() {
@@ -197,36 +192,6 @@ public class AllocationListController {
         }
     }
 
-    private static String resolveBaseUrl() {
-        String configuredBaseUrl = configValue("API_BASE_URL");
-        if (configuredBaseUrl != null) {
-            return stripTrailingSlash(configuredBaseUrl);
-        }
-
-        String serverPort = configValue("SERVER_PORT");
-        if (serverPort == null) {
-            serverPort = DEFAULT_SERVER_PORT;
-        }
-
-        return "http://localhost:" + serverPort + ALLOCATION_API_PATH;
-    }
-
-    private static String configValue(String key) {
-        String value = System.getenv(key);
-        if (value == null || value.isBlank()) {
-            value = DOTENV.get(key);
-        }
-        return (value == null || value.isBlank()) ? null : value.trim();
-    }
-
-    private static String stripTrailingSlash(String value) {
-        String result = value.trim();
-        while (result.endsWith("/")) {
-            result = result.substring(0, result.length() - 1);
-        }
-        return result;
-    }
-
     private void showPreviewDialog(AllocationPlanDTO plan) {
         StringBuilder builder = new StringBuilder();
 
@@ -250,6 +215,8 @@ public class AllocationListController {
                         .append(item.getSiteName())
                         .append(" | SL phân bổ: ")
                         .append(item.getAllocatedQuantity())
+                        .append(" | VC: ")
+                        .append(item.getDeliveryMeans() == null ? "" : item.getDeliveryMeans())
                         .append("\n");
             }
         }

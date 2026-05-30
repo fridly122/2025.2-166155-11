@@ -1,6 +1,7 @@
 package itss.group11.services.transport;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class TransportService {
+
+    private static final Set<String> ALLOWED_VEHICLES = Set.of("AIR", "SHIP", "TRUCK");
 
     private final TransportRepository transportRepository;
     private final PurchaseOrderRepository purchaseOrderRepository;
@@ -43,6 +46,7 @@ public class TransportService {
     @Transactional
     public TransportDetailDTO createTransport(TransportCreateDTO dto) {
         validateCreateDTO(dto);
+        String vehicle = normalizeVehicle(dto.getVehicle());
 
         PurchaseOrder purchaseOrder = purchaseOrderRepository.findByOrderId(dto.getOrderId())
                 .orElseThrow(() -> new RuntimeException("Khong tim thay don dat hang: " + dto.getOrderId()));
@@ -60,7 +64,7 @@ public class TransportService {
                 .sourceSite(purchaseOrder.getSite())
                 .destinationSiteName(dto.getDestinationSiteName().trim())
                 .deliveryDays(dto.getDeliveryDays())
-                .vehicle(dto.getVehicle().trim())
+                .vehicle(vehicle)
                 .transportStatus(TransportInfo.TransportStatus.IN_TRANSIT)
                 .build();
 
@@ -98,13 +102,14 @@ public class TransportService {
     @Transactional
     public TransportDetailDTO updateTransport(Long id, TransportUpdateDTO dto) {
         validateUpdateDTO(dto);
+        String vehicle = normalizeVehicle(dto.getVehicle());
 
         TransportInfo transportInfo = transportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Khong tim thay thong tin van chuyen: " + id));
 
         transportInfo.setDestinationSiteName(dto.getDestinationSiteName().trim());
         transportInfo.setDeliveryDays(dto.getDeliveryDays());
-        transportInfo.setVehicle(dto.getVehicle().trim());
+        transportInfo.setVehicle(vehicle);
         transportInfo.setTransportStatus(parseTransportStatus(dto.getTransportStatus()));
 
         PurchaseOrder purchaseOrder = transportInfo.getPurchaseOrder();
@@ -133,9 +138,7 @@ public class TransportService {
             throw new RuntimeException("Site dich khong duoc de trong.");
         }
 
-        if (dto.getVehicle() == null || dto.getVehicle().isBlank()) {
-            throw new RuntimeException("Phuong tien van chuyen khong duoc de trong.");
-        }
+        normalizeVehicle(dto.getVehicle());
 
         if (dto.getDeliveryDays() == null || dto.getDeliveryDays() <= 0 || dto.getDeliveryDays() > 365) {
             throw new RuntimeException("So ngay van chuyen phai lon hon 0 va khong qua 365.");
@@ -151,9 +154,7 @@ public class TransportService {
             throw new RuntimeException("Site dich khong duoc de trong.");
         }
 
-        if (dto.getVehicle() == null || dto.getVehicle().isBlank()) {
-            throw new RuntimeException("Phuong tien van chuyen khong duoc de trong.");
-        }
+        normalizeVehicle(dto.getVehicle());
 
         if (dto.getDeliveryDays() == null || dto.getDeliveryDays() <= 0 || dto.getDeliveryDays() > 365) {
             throw new RuntimeException("So ngay van chuyen phai lon hon 0 va khong qua 365.");
@@ -172,6 +173,19 @@ public class TransportService {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Trang thai van chuyen khong hop le: " + status);
         }
+    }
+
+    private String normalizeVehicle(String vehicle) {
+        if (vehicle == null || vehicle.isBlank()) {
+            throw new RuntimeException("Phuong tien van chuyen khong duoc de trong.");
+        }
+
+        String normalizedVehicle = vehicle.trim().toUpperCase();
+        if (!ALLOWED_VEHICLES.contains(normalizedVehicle)) {
+            throw new RuntimeException("Phuong tien van chuyen khong hop le. Chi chap nhan AIR, SHIP hoac TRUCK.");
+        }
+
+        return normalizedVehicle;
     }
 
     private PendingPurchaseOrderDTO toPendingOrderDTO(PurchaseOrder purchaseOrder) {
