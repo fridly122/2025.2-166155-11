@@ -15,6 +15,7 @@ import itss.group11.models.ImportSite;
 public interface ImportSiteRepository extends JpaRepository<ImportSite, String> {
     
     Optional<ImportSite> findBySiteCode(String siteCode);
+    List<ImportSite> findAllByOrderBySiteCodeAsc();
 
     /**
      * Truy vấn PostgreSQL tính tổng số lượng tồn kho của một mặt hàng trên toàn bộ hệ thống các Site
@@ -30,4 +31,13 @@ public interface ImportSiteRepository extends JpaRepository<ImportSite, String> 
                    "WHERE si.merchandise.code = :merchandiseCode AND si.inStockQuantity > 0 " +
                    "ORDER BY si.inStockQuantity DESC")
     List<SiteStockDTO> findStockDetailsByItem(@Param("merchandiseCode") String merchandiseCode);
+
+    @Query("""
+            SELECT DISTINCT s
+            FROM ImportSite s
+            JOIN s.merchandiseList m
+            WHERE m.code = :merchandiseCode
+            ORDER BY s.siteCode ASC
+            """)
+    List<ImportSite> findSitesSellingMerchandise(@Param("merchandiseCode") String merchandiseCode);
 }

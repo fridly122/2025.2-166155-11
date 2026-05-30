@@ -37,7 +37,7 @@ public class AllocationService {
     @Transactional(readOnly = true)
     public List<AllocationRequestRowDTO> getPendingRequests() {
         return orderRequestRepository
-                .findByStatusOrderByCreatedAtDesc(OrderRequest.OrderRequestStatus.PENDING)
+                .findByStatusOrderByCreatedAtAsc(OrderRequest.OrderRequestStatus.PENDING)
                 .stream()
                 .map(request -> AllocationRequestRowDTO.builder()
                         .requestCode(request.getRequestCode())

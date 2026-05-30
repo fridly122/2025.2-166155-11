@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+<BorderPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="itss.group11.frontend.screens.dashboard.DashboardController">
-   
+
    <top>
       <AnchorPane prefHeight="60.0" prefWidth="1100.0" style="-fx-background-color: #1a252f; -fx-padding: 10;">
          <children>
-            <Label layoutX="20.0" layoutY="16.0" text="HỆ THỐNG ĐẶT HÀNG NHẬP KHẨU - NHÓM 11" textFill="WHITE">
+            <Label layoutX="20.0" layoutY="16.0" text="HỆ THỐNG ĐẶT HÀNG NHẬP KHẨU" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
+            <Button layoutX="990.0" layoutY="13.0"
+                    mnemonicParsing="false"
+                    onAction="#handleLogout"
+                    prefHeight="34.0"
+                    prefWidth="90.0"
+                    text="Đăng xuất"
+                    style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
          </children>
       </AnchorPane>
    </top>
@@ -28,21 +39,24 @@
                </font>
             </Label>
             <Separator prefWidth="200.0" style="-fx-opacity: 0.3;" />
-            
-            <Button fx:id="btnCreateRequest" mnemonicParsing="false" onAction="#handleNavCreateRequest" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="Tạo yêu cầu nhập hàng" />
-            
-            <Button fx:id="btnClassification" mnemonicParsing="false" onAction="#handleNavClassification" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="Tìm Site &amp; Phân loại" />
-            
-            <Button fx:id="btnShipping" mnemonicParsing="false" onAction="#handleNavShipping" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="Quản lý vận chuyển Site" />
-            
-            <Button fx:id="btnAllocation" mnemonicParsing="false" onAction="#handleNavAllocation" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-alignment: LEFT; -fx-font-weight: bold;" text="Lập kế hoạch đặt hàng" />
-            
-            <Button fx:id="btnReconciliation" mnemonicParsing="false" onAction="#handleNavReconciliation" 
-                    prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: LEFT;" text="Đối soát &amp; Nhập kho" />
+
+            <Button fx:id="btnCreateRequest" mnemonicParsing="false" onAction="#handleNavCreateRequest"
+                    prefHeight="40.0" prefWidth="230.0" text="Tạo yêu cầu nhập hàng" />
+
+            <Button fx:id="btnClassification" mnemonicParsing="false" onAction="#handleNavClassification"
+                    prefHeight="40.0" prefWidth="230.0" text="Tìm Site &amp; Phân loại" />
+
+            <Button fx:id="btnInventory" mnemonicParsing="false" onAction="#handleNavInventory"
+                    prefHeight="40.0" prefWidth="230.0" text="Cập nhật tồn kho Site" />
+
+            <Button fx:id="btnShipping" mnemonicParsing="false" onAction="#handleNavShipping"
+                    prefHeight="40.0" prefWidth="230.0" text="Quản lý vận chuyển Site" />
+
+            <Button fx:id="btnAllocation" mnemonicParsing="false" onAction="#handleNavAllocation"
+                    prefHeight="40.0" prefWidth="230.0" text="Lập kế hoạch đặt hàng" />
+
+            <Button fx:id="btnReconciliation" mnemonicParsing="false" onAction="#handleNavReconciliation"
+                    prefHeight="40.0" prefWidth="230.0" text="Đối soát &amp; Nhập kho" />
          </children>
       </VBox>
    </left>

@@ -1,5 +1,6 @@
 package itss.group11.repository.orderExecution;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,7 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, St
     Optional<PurchaseOrder> findByOrderId(String orderId);
 
     boolean existsByOrderId(String orderId);
+
+    List<PurchaseOrder> findByStatusOrderByCreatedAtDesc(PurchaseOrder.PurchaseOrderStatus status);
+    List<PurchaseOrder> findByStatusOrderByCreatedAtAsc(PurchaseOrder.PurchaseOrderStatus status);
 }

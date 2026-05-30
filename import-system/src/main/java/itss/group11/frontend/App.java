@@ -28,8 +28,8 @@ public class App extends Application {
         primaryStage.setMinHeight(600);
 
         StageManager.switchScene(
-                "/itss/group11/dashboard/dashboard.fxml",
-                "He thong Dat hang Nhap khau - Nhom 11"
+                "/itss/group11/login/login.fxml",
+                "Dang nhap - He thong Dat hang Nhap khau"
         );
     }
 
