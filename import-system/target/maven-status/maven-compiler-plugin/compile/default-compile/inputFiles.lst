@@ -35,6 +35,9 @@ G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\Inve
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\dto\warehouse\SiteOptionDTO.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\ApiConfig.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\App.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\auth\AppFeature.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\auth\LoginSession.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\auth\UserRole.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\screens\allocationList\AllocationListController.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\screens\dashboard\DashboardController.java
 G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\frontend\screens\login\LoginController.java

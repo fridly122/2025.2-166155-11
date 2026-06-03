@@ -18,8 +18,31 @@ Bước 3: Xử lý lập kế hoạch đặt hàng - Màn hình 3.1: Danh sách
 Bước 4: Đối soát và Xác nhận nhập kho - Màn hình 4.1: Danh sách Đơn đặt hàng (PO) đang vận chuyển (IN_TRANSIT). - Màn hình 4.2: Chi tiết đối soát. Khi hàng về đến kho nội địa, nhân viên kho chọn mã PO, nhập số lượng thực nhận (received_qty). Hệ thống tự động hiển thị số chênh lệch. Nếu có sai lệch -> Hiện Pop-up lập biên bản. Nếu khớp -> Bấm "Xác nhận nhập kho" để hoàn tất vòng đời.
 
 III. CHẠY CHƯƠNG TRÌNH
+
 mvn clean javafx:run / mvn javafx:run
 
-IV. TÀI KHOẢN ĐĂNG NHẬP (NHÂN VIÊN)
-- Khi đăng nhập đã có sẵn tên đăng nhập: employee (nếu lỡ xóa đi thì nhập "employee" vào phần tên đăng nhập)
-- Mật khẩu: 123456
+IV. TÀI KHOẢN ĐĂNG NHẬP 
+
+(Tất cả các role có password là: 123456)
+
+1. Bộ phận bán hàng
+    - Tên đăng nhập: sales
+    - Chức năng: 
+        + Tạo yêu cầu nhập hàng
+    
+2. Bộ phận đặt hàng quốc tế
+    - Tên đăng nhập: order
+    - Chức năng: 
+        + Tìm kiếm Site và phân loại mặt hàng
+        + Quản lý thông tin vận chuyển Site
+        + Xử lý lập kế hoạch đặt hàng
+
+3. Site nhập khẩu
+    - Tên đăng nhập: site
+    - Chức năng:
+        + Cập nhật thông tin tồn kho Site
+
+4. Bộ phận quản lý kho
+    - Tên đăng nhập: warehouse
+    - Chức năng: 
+        + Đối soát và xác nhận nhập kho

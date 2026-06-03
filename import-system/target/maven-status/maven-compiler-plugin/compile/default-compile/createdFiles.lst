@@ -36,6 +36,7 @@ itss\group11\dto\siteSync\SiteClassificationResultDTO$SiteClassificationResultDT
 itss\group11\dto\warehouse\InventoryUpdateDTO.class
 itss\group11\frontend\screens\orderReconciliation\OrderReconciliationController$LineRow.class
 itss\group11\dto\allocation\AllocationResultDTO$AllocationResultDTOBuilder.class
+itss\group11\frontend\auth\UserRole.class
 itss\group11\controllers\transport\TransportController.class
 module-info.class
 itss\group11\models\Merchandise$MerchandiseBuilder.class
@@ -46,6 +47,7 @@ itss\group11\models\PurchaseOrder.class
 itss\group11\frontend\stage\StageManager.class
 itss\group11\repository\transport\TransportRepository.class
 itss\group11\dto\requestManage\OrderRequestDetailDTO$ItemDTO$ItemDTOBuilder.class
+itss\group11\frontend\auth\AppFeature.class
 itss\group11\frontend\screens\siteShippingManage\SiteShippingManageController$PendingOrderRow.class
 itss\group11\models\TransportInfo$TransportInfoBuilder.class
 itss\group11\frontend\screens\dashboard\DashboardController.class
@@ -67,6 +69,7 @@ itss\group11\dto\allocation\SiteStockDTO$SiteStockDTOBuilder.class
 itss\group11\models\InventoryInquiryItem.class
 itss\group11\controllers\allocation\AllocationController.class
 itss\group11\services\allocation\AllocationService.class
+itss\group11\frontend\auth\LoginSession.class
 itss\group11\repository\siteSync\SiteInventoryRepository.class
 itss\group11\dto\transport\TransportCreateDTO.class
 itss\group11\dto\allocation\AllocationPlanDTO.class
@@ -100,6 +103,7 @@ itss\group11\dto\allocation\AllocationPlanItemDTO$AllocationPlanItemDTOBuilder.c
 itss\group11\dto\siteSync\OrderRequestClassificationDTO$OrderRequestClassificationDTOBuilder.class
 itss\group11\dto\orderExecution\ReconciliationResultDTO$ReconciliationResultDTOBuilder.class
 itss\group11\dto\requestManage\OrderRequestSummaryDTO.class
+itss\group11\frontend\screens\dashboard\DashboardController$1.class
 itss\group11\dto\siteSync\InventoryInquiryRequestDTO.class
 itss\group11\dto\siteSync\InventoryInquirySendResultDTO$InventoryInquirySendResultDTOBuilder.class
 itss\group11\frontend\screens\siteInventoryManage\SiteInventoryManageController$2.class

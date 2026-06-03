@@ -1,5 +1,7 @@
 package itss.group11.frontend.screens.login;
 
+import itss.group11.frontend.auth.LoginSession;
+import itss.group11.frontend.auth.UserRole;
 import itss.group11.frontend.stage.StageManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -8,8 +10,7 @@ import javafx.scene.control.TextField;
 
 public class LoginController {
 
-    private static final String EMPLOYEE_USERNAME = "employee";
-    private static final String EMPLOYEE_PASSWORD = "123456";
+    private static final String MOCK_PASSWORD = "123456";
 
     @FXML
     private TextField txtUsername;
@@ -23,7 +24,8 @@ public class LoginController {
     @FXML
     public void initialize() {
         lblMessage.setText("");
-        txtUsername.setText(EMPLOYEE_USERNAME);
+        LoginSession.clear();
+        txtUsername.setText(UserRole.SALES.getUsername());
     }
 
     @FXML
@@ -36,11 +38,14 @@ public class LoginController {
             return;
         }
 
-        if (!EMPLOYEE_USERNAME.equals(username) || !EMPLOYEE_PASSWORD.equals(password)) {
+        UserRole role = UserRole.findByUsername(username).orElse(null);
+        if (role == null || !MOCK_PASSWORD.equals(password)) {
             txtPassword.clear();
             showMessage("Tên đăng nhập hoặc mật khẩu không đúng.");
             return;
         }
+
+        LoginSession.login(role.getUsername(), role);
 
         StageManager.switchScene(
                 "/itss/group11/dashboard/dashboard.fxml",

@@ -4,12 +4,18 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import itss.group11.frontend.auth.AppFeature;
+import itss.group11.frontend.auth.LoginSession;
+import itss.group11.frontend.auth.UserRole;
 import itss.group11.frontend.stage.StageManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 
 public class DashboardController {
 
@@ -34,8 +40,19 @@ public class DashboardController {
             "-fx-font-weight: bold; " +
             "-fx-cursor: hand;";
 
+    private static final String NAV_DISABLED_STYLE =
+            "-fx-background-color: transparent; " +
+            "-fx-text-fill: #7f8c8d; " +
+            "-fx-alignment: LEFT; " +
+            "-fx-font-weight: normal; " +
+            "-fx-cursor: default; " +
+            "-fx-opacity: 0.65;";
+
     @FXML
     private AnchorPane contentArea;
+
+    @FXML
+    private Label lblCurrentRole;
 
     @FXML
     private Button btnCreateRequest;
@@ -66,8 +83,20 @@ public class DashboardController {
     @FXML
     public void initialize() {
         instance = this;
+
+        if (!LoginSession.isAuthenticated()) {
+            StageManager.switchScene(
+                    "/itss/group11/login/login.fxml",
+                    "Đăng nhập - Hệ thống Đặt hàng Nhập khẩu"
+            );
+            return;
+        }
+
+        UserRole role = LoginSession.getRole();
+        lblCurrentRole.setText("Vai trò: " + role.getDisplayName());
+        setupSidebarPermissions(role);
         setupSidebarHover();
-        navigateTo(btnAllocation, "/itss/group11/allocationList/allocationList.fxml");
+        navigateToDefaultFeature(role);
     }
 
     public Object loadSubScreen(String fxmlPath) {
@@ -98,43 +127,50 @@ public class DashboardController {
 
     @FXML
     private void handleNavCreateRequest() {
-        navigateTo(btnCreateRequest, "/itss/group11/orderRequestCreate/orderRequestCreate.fxml");
+        navigateTo(AppFeature.CREATE_REQUEST, btnCreateRequest, "/itss/group11/orderRequestCreate/orderRequestCreate.fxml");
     }
 
     @FXML
     private void handleNavClassification() {
-        navigateTo(btnClassification, "/itss/group11/siteClassification/siteClassification.fxml");
+        navigateTo(AppFeature.CLASSIFICATION, btnClassification, "/itss/group11/siteClassification/siteClassification.fxml");
     }
 
     @FXML
     private void handleNavInventory() {
-        navigateTo(btnInventory, "/itss/group11/siteInventoryManage/siteInventoryManage.fxml");
+        navigateTo(AppFeature.INVENTORY, btnInventory, "/itss/group11/siteInventoryManage/siteInventoryManage.fxml");
     }
 
     @FXML
     private void handleNavShipping() {
-        navigateTo(btnShipping, "/itss/group11/siteShippingManage/siteShippingManage.fxml");
+        navigateTo(AppFeature.SHIPPING, btnShipping, "/itss/group11/siteShippingManage/siteShippingManage.fxml");
     }
 
     @FXML
     private void handleNavAllocation() {
-        navigateTo(btnAllocation, "/itss/group11/allocationList/allocationList.fxml");
+        navigateTo(AppFeature.ALLOCATION, btnAllocation, "/itss/group11/allocationList/allocationList.fxml");
     }
 
     @FXML
     private void handleNavReconciliation() {
-        navigateTo(btnReconciliation, "/itss/group11/orderReconciliation/orderReconciliation.fxml");
+        navigateTo(AppFeature.RECONCILIATION, btnReconciliation, "/itss/group11/orderReconciliation/orderReconciliation.fxml");
     }
 
     @FXML
     private void handleLogout() {
+        LoginSession.clear();
         StageManager.switchScene(
                 "/itss/group11/login/login.fxml",
                 "Đăng nhập - Hệ thống Đặt hàng Nhập khẩu"
         );
     }
 
-    private void navigateTo(Button button, String fxmlPath) {
+    private void navigateTo(AppFeature feature, Button button, String fxmlPath) {
+        UserRole role = LoginSession.getRole();
+        if (role == null || !role.canAccess(feature)) {
+            showAccessDenied();
+            return;
+        }
+
         Object controller = loadSubScreen(fxmlPath);
         if (controller != null) {
             setActiveButton(button);
@@ -143,7 +179,12 @@ public class DashboardController {
 
     private void setupSidebarHover() {
         for (Button button : getNavButtons()) {
-            button.setStyle(NAV_BASE_STYLE);
+            if (button.isDisabled()) {
+                button.setStyle(NAV_DISABLED_STYLE);
+                continue;
+            }
+
+            button.setStyle(button == activeButton ? NAV_ACTIVE_STYLE : NAV_BASE_STYLE);
 
             button.setOnMouseEntered(event -> {
                 if (button != activeButton) {
@@ -162,8 +203,49 @@ public class DashboardController {
     private void setActiveButton(Button selectedButton) {
         activeButton = selectedButton;
         for (Button button : getNavButtons()) {
+            if (button.isDisabled()) {
+                button.setStyle(NAV_DISABLED_STYLE);
+                continue;
+            }
+
             button.setStyle(button == activeButton ? NAV_ACTIVE_STYLE : NAV_BASE_STYLE);
         }
+    }
+
+    private void setupSidebarPermissions(UserRole role) {
+        setFeaturePermission(btnCreateRequest, role.canAccess(AppFeature.CREATE_REQUEST));
+        setFeaturePermission(btnClassification, role.canAccess(AppFeature.CLASSIFICATION));
+        setFeaturePermission(btnInventory, role.canAccess(AppFeature.INVENTORY));
+        setFeaturePermission(btnShipping, role.canAccess(AppFeature.SHIPPING));
+        setFeaturePermission(btnAllocation, role.canAccess(AppFeature.ALLOCATION));
+        setFeaturePermission(btnReconciliation, role.canAccess(AppFeature.RECONCILIATION));
+    }
+
+    private void setFeaturePermission(Button button, boolean allowed) {
+        button.setDisable(!allowed);
+        button.setVisible(allowed);
+        button.setManaged(allowed);
+        button.setStyle(allowed ? NAV_BASE_STYLE : NAV_DISABLED_STYLE);
+    }
+
+    private void navigateToDefaultFeature(UserRole role) {
+        switch (role.getDefaultFeature()) {
+            case CREATE_REQUEST -> handleNavCreateRequest();
+            case CLASSIFICATION -> handleNavClassification();
+            case INVENTORY -> handleNavInventory();
+            case SHIPPING -> handleNavShipping();
+            case ALLOCATION -> handleNavAllocation();
+            case RECONCILIATION -> handleNavReconciliation();
+        }
+    }
+
+    private void showAccessDenied() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Không có quyền truy cập");
+        alert.setHeaderText("Không có quyền truy cập");
+        alert.setContentText("Vai trò hiện tại không được phép sử dụng chức năng này.");
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.showAndWait();
     }
 
     private List<Button> getNavButtons() {

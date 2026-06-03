@@ -26,6 +26,10 @@
                </font>
             </Label>
             <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblCurrentRole"
+                   maxWidth="420.0"
+                   textFill="#dce6ef"
+                   style="-fx-background-color: #2c3e50; -fx-background-radius: 6; -fx-padding: 7 10; -fx-font-weight: bold;" />
             <Button minWidth="105.0"
                     mnemonicParsing="false"
                     onAction="#handleLogout"
