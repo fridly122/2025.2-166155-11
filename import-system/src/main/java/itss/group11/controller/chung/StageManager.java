@@ -8,46 +8,46 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class StageManager {
-    // Biáº¿n static lÆ°u trá»¯ cá»­a sá»• chÃ­nh cá»§a pháº§n má»m
+    // Biến static lưu trữ cửa sổ chính của phần mềm
     private static Stage primaryStage;
 
     /**
-     * HÃ m nÃ y chá»‰ Ä‘Æ°á»£c gá»i DUY NHáº¤T 1 Láº¦N khi pháº§n má»m vá»«a khá»Ÿi Ä‘á»™ng táº¡i App.java
+     * Hàm này chỉ được gọi DUY NHẤT 1 LẦN khi phần mềm vừa khởi động tại App.java
      */
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
     }
 
     /**
-     * HÃ m dÃ¹ng chung Ä‘á»ƒ chuyá»ƒn Ä‘á»•i mÃ n hÃ¬nh (Load file FXML)
-     * * @param fxmlPath ÄÆ°á»ng dáº«n tuyá»‡t Ä‘á»‘i tÃ­nh tá»« thÆ° má»¥c resources (VÃ­ dá»¥: "/itss/group11/view/chung/dashboard.fxml")
-     * @param title    TiÃªu Ä‘á» hiá»ƒn thá»‹ trÃªn cá»­a sá»•
-     * @return Tráº£ vá» Controller cá»§a mÃ n hÃ¬nh má»›i
+     * Hàm dùng chung để chuyển đổi màn hình (Load file FXML)
+     * * @param fxmlPath Đường dẫn tuyệt đối tính từ thư mục resources (Ví dụ: "/itss/group11/view/chung/dashboard.fxml")
+     * @param title    Tiêu đề hiển thị trên cửa sổ
+     * @return Trả về Controller của màn hình mới
      */
     public static Object switchScene(String fxmlPath, String title) {
         try {
-            // Láº¥y URL cá»§a file FXML tá»« tÃ i nguyÃªn há»‡ thá»‘ng
+            // Lấy URL của file FXML từ tài nguyên hệ thống
             URL fxmlUrl = StageManager.class.getResource(fxmlPath);
             
-            // Kiá»ƒm tra náº¿u khÃ´ng tÃ¬m tháº¥y file (trÃ¡nh lá»—i Location is not set)
+            // Kiểm tra nếu không tìm thấy file (tránh lỗi Location is not set)
             if (fxmlUrl == null) {
                 throw new IllegalArgumentException("KHONG TIM THAY FILE FXML! Hay kiem tra lai chinh xac duong dan: " + fxmlPath);
             }
 
-            // Táº£i file giao diá»‡n
+            // Tải file giao diện
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
             
-            // Táº¡o Scene má»›i vÃ  náº¡p vÃ o cá»­a sá»• chÃ­nh
+            // Tạo Scene mới và nạp vào cửa sổ chính
             Scene scene = new Scene(root);
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
             
-            // CÄƒn giá»¯a cá»­a sá»• trÃªn mÃ n hÃ¬nh mÃ¡y tÃ­nh
+            // Căn giữa cửa sổ trên màn hình máy tính
             primaryStage.centerOnScreen();
             primaryStage.show();
             
-            // Tráº£ vá» Controller cá»§a mÃ n hÃ¬nh vá»«a load
+            // Trả về Controller của màn hình vừa load
             return loader.getController();
             
         } catch (IOException | IllegalArgumentException e) {

@@ -34,14 +34,14 @@ public class LoginController {
         String password = txtPassword.getText() == null ? "" : txtPassword.getText();
 
         if (username.isBlank() || password.isBlank()) {
-            showMessage("Vui lÃ²ng nháº­p Ä‘áº§y Ä‘á»§ tÃªn Ä‘Äƒng nháº­p vÃ  máº­t kháº©u.");
+            showMessage("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
             return;
         }
 
         UserRole role = UserRole.findByUsername(username).orElse(null);
         if (role == null || !MOCK_PASSWORD.equals(password)) {
             txtPassword.clear();
-            showMessage("TÃªn Ä‘Äƒng nháº­p hoáº·c máº­t kháº©u khÃ´ng Ä‘Ãºng.");
+            showMessage("Tên đăng nhập hoặc mật khẩu không đúng.");
             return;
         }
 
@@ -49,7 +49,7 @@ public class LoginController {
 
         StageManager.switchScene(
                 "/itss/group11/view/chung/dashboard.fxml",
-                "Há»‡ thá»‘ng Äáº·t hÃ ng Nháº­p kháº©u"
+                "Hệ thống Đặt hàng Nhập khẩu"
         );
     }
 

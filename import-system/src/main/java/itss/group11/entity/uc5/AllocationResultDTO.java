@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * DTO chá»©a káº¿t quáº£ tráº£ vá» sau khi thá»±c hiá»‡n xá»­ lÃ½ láº­p káº¿ hoáº¡ch Ä‘áº·t hÃ ng (UC005)
- * DÃ¹ng Ä‘á»ƒ Ä‘áº©y dá»¯ liá»‡u tá»« Service qua Controller vÃ  tráº£ vá» cho Frontend hiá»ƒn thá»‹.
+ * DTO chứa kết quả trả về sau khi thực hiện xử lý lập kế hoạch đặt hàng (UC005)
+ * Dùng để đẩy dữ liệu từ Service qua Controller và trả về cho Frontend hiển thị.
  */
 @Data
 @Builder
@@ -17,8 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 public class AllocationResultDTO {
     
-    private String requestCode;       // MÃ£ yÃªu cáº§u nháº­p hÃ ng (VD: REQ-9942A)
-    private boolean isSuccess;        // Tráº¡ng thÃ¡i xá»­ lÃ½ (true: ThÃ nh cÃ´ng, false: Tháº¥t báº¡i)
-    private String message;           // ThÃ´ng bÃ¡o chi tiáº¿t (VD: "PhÃ¢n bá»• thÃ nh cÃ´ng", "Thiáº¿u hÃ ng tá»“n kho")
-    private List<String> generatedPoCodes; // Danh sÃ¡ch cÃ¡c mÃ£ Ä‘Æ¡n hÃ ng PO Ä‘Æ°á»£c tá»± Ä‘á»™ng sinh ra sau khi phÃ¢n bá»•
+    private String requestCode;       // Mã yêu cầu nhập hàng (VD: REQ-9942A)
+    private boolean isSuccess;        // Trạng thái xử lý (true: Thành công, false: Thất bại)
+    private String message;           // Thông báo chi tiết (VD: "Phân bổ thành công", "Thiếu hàng tồn kho")
+    private List<String> generatedPoCodes; // Danh sách các mã đơn hàng PO được tự động sinh ra sau khi phân bổ
 }

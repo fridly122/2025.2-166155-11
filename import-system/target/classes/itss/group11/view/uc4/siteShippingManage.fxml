@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -37,31 +37,31 @@
             <children>
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                     <children>
-                        <Label text="QUáº¢N LÃ THÃ”NG TIN Váº¬N CHUYá»‚N SITE" textFill="#2c3e50">
+                        <Label text="QUẢN LÝ THÔNG TIN VẬN CHUYỂN SITE" textFill="#2c3e50">
                             <font>
                                 <Font name="System Bold" size="20.0"/>
                             </font>
                         </Label>
                         <Button mnemonicParsing="false"
                                 onAction="#handleRefresh"
-                                text="LÃ m má»›i"
+                                text="Làm mới"
                                 style="-fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-cursor: hand;"/>
                     </children>
                 </HBox>
 
                 <TabPane VBox.vgrow="ALWAYS">
                     <tabs>
-                        <Tab closable="false" text="Táº¡o váº­n chuyá»ƒn">
+                        <Tab closable="false" text="Tạo vận chuyển">
                             <content>
                                 <VBox spacing="12.0" style="-fx-padding: 12;">
                                     <children>
                                         <TableView fx:id="pendingOrderTable" VBox.vgrow="ALWAYS" style="-fx-font-size: 14px;">
                                             <columns>
-                                                <TableColumn fx:id="colOrderId" prefWidth="130.0" text="MÃ£ PO"/>
-                                                <TableColumn fx:id="colRequestCode" prefWidth="140.0" text="MÃ£ yÃªu cáº§u"/>
-                                                <TableColumn fx:id="colSourceSite" prefWidth="260.0" text="Site nguá»“n"/>
-                                                <TableColumn fx:id="colStatus" prefWidth="120.0" text="Tráº¡ng thÃ¡i"/>
-                                                <TableColumn fx:id="colCreatedDate" prefWidth="160.0" text="NgÃ y táº¡o"/>
+                                                <TableColumn fx:id="colOrderId" prefWidth="130.0" text="Mã PO"/>
+                                                <TableColumn fx:id="colRequestCode" prefWidth="140.0" text="Mã yêu cầu"/>
+                                                <TableColumn fx:id="colSourceSite" prefWidth="260.0" text="Site nguồn"/>
+                                                <TableColumn fx:id="colStatus" prefWidth="120.0" text="Trạng thái"/>
+                                                <TableColumn fx:id="colCreatedDate" prefWidth="160.0" text="Ngày tạo"/>
                                             </columns>
                                             <columnResizePolicy>
                                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -70,7 +70,7 @@
 
                                         <VBox spacing="10.0" style="-fx-background-color: #f8f9fa; -fx-background-radius: 6; -fx-padding: 15;">
                                             <children>
-                                                <Label fx:id="lblSelectedOrder" text="ChÆ°a chá»n Ä‘Æ¡n hÃ ng" textFill="#34495e">
+                                                <Label fx:id="lblSelectedOrder" text="Chưa chọn đơn hàng" textFill="#34495e">
                                                     <font>
                                                         <Font name="System Bold" size="14.0"/>
                                                     </font>
@@ -78,19 +78,19 @@
 
                                                 <GridPane hgap="12.0" vgap="10.0">
                                                     <children>
-                                                        <Label text="Site Ä‘Ã­ch:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                                        <Label text="Site đích:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                                                         <TextField fx:id="txtDestinationSite"
-                                                                   promptText="VD: Kho ná»™i Ä‘á»‹a HÃ  Ná»™i"
+                                                                   promptText="VD: Kho nội địa Hà Nội"
                                                                    GridPane.columnIndex="1"
                                                                    GridPane.rowIndex="0"/>
 
-                                                        <Label text="PhÆ°Æ¡ng tiá»‡n:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                                        <Label text="Phương tiện:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                                                         <ComboBox fx:id="cboVehicle"
                                                                   prefWidth="180.0"
                                                                   GridPane.columnIndex="1"
                                                                   GridPane.rowIndex="1"/>
 
-                                                        <Label text="Sá»‘ ngÃ y váº­n chuyá»ƒn:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                                        <Label text="Số ngày vận chuyển:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                                                         <Spinner fx:id="spnDeliveryDays"
                                                                  editable="true"
                                                                  prefWidth="120.0"
@@ -109,7 +109,7 @@
                                                                 mnemonicParsing="false"
                                                                 onAction="#handleCreateTransport"
                                                                 prefHeight="38.0"
-                                                                text="Táº¡o váº­n chuyá»ƒn"
+                                                                text="Tạo vận chuyển"
                                                                 style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
                                                     </children>
                                                 </HBox>
@@ -120,20 +120,20 @@
                             </content>
                         </Tab>
 
-                        <Tab closable="false" text="Danh sÃ¡ch váº­n chuyá»ƒn">
+                        <Tab closable="false" text="Danh sách vận chuyển">
                             <content>
                                 <VBox spacing="12.0" style="-fx-padding: 12;">
                                     <children>
                                         <TableView fx:id="transportTable" VBox.vgrow="ALWAYS" style="-fx-font-size: 14px;">
                                             <columns>
                                                 <TableColumn fx:id="colTransportId" prefWidth="70.0" text="ID"/>
-                                                <TableColumn fx:id="colTransportOrderId" prefWidth="120.0" text="MÃ£ PO"/>
-                                                <TableColumn fx:id="colTransportSourceSite" prefWidth="210.0" text="Site nguá»“n"/>
-                                                <TableColumn fx:id="colDestinationSite" prefWidth="170.0" text="Site Ä‘Ã­ch"/>
-                                                <TableColumn fx:id="colVehicle" prefWidth="120.0" text="PhÆ°Æ¡ng tiá»‡n"/>
-                                                <TableColumn fx:id="colDeliveryDays" prefWidth="80.0" text="Sá»‘ ngÃ y"/>
-                                                <TableColumn fx:id="colTransportStatus" prefWidth="120.0" text="Tráº¡ng thÃ¡i VC"/>
-                                                <TableColumn fx:id="colPurchaseOrderStatus" prefWidth="110.0" text="Tráº¡ng thÃ¡i PO"/>
+                                                <TableColumn fx:id="colTransportOrderId" prefWidth="120.0" text="Mã PO"/>
+                                                <TableColumn fx:id="colTransportSourceSite" prefWidth="210.0" text="Site nguồn"/>
+                                                <TableColumn fx:id="colDestinationSite" prefWidth="170.0" text="Site đích"/>
+                                                <TableColumn fx:id="colVehicle" prefWidth="120.0" text="Phương tiện"/>
+                                                <TableColumn fx:id="colDeliveryDays" prefWidth="80.0" text="Số ngày"/>
+                                                <TableColumn fx:id="colTransportStatus" prefWidth="120.0" text="Trạng thái VC"/>
+                                                <TableColumn fx:id="colPurchaseOrderStatus" prefWidth="110.0" text="Trạng thái PO"/>
                                             </columns>
                                             <columnResizePolicy>
                                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -142,7 +142,7 @@
 
                                         <VBox spacing="10.0" style="-fx-background-color: #f8f9fa; -fx-background-radius: 6; -fx-padding: 15;">
                                             <children>
-                                                <Label fx:id="lblSelectedTransport" text="ChÆ°a chá»n thÃ´ng tin váº­n chuyá»ƒn" textFill="#34495e">
+                                                <Label fx:id="lblSelectedTransport" text="Chưa chọn thông tin vận chuyển" textFill="#34495e">
                                                     <font>
                                                         <Font name="System Bold" size="14.0"/>
                                                     </font>
@@ -150,19 +150,19 @@
 
                                                 <GridPane hgap="12.0" vgap="10.0">
                                                     <children>
-                                                        <Label text="Site Ä‘Ã­ch:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                                        <Label text="Site đích:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                                                         <TextField fx:id="txtEditDestinationSite"
                                                                    prefWidth="220.0"
                                                                    GridPane.columnIndex="1"
                                                                    GridPane.rowIndex="0"/>
 
-                                                        <Label text="PhÆ°Æ¡ng tiá»‡n:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                                        <Label text="Phương tiện:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
                                                         <ComboBox fx:id="cboEditVehicle"
                                                                   prefWidth="180.0"
                                                                   GridPane.columnIndex="3"
                                                                   GridPane.rowIndex="0"/>
 
-                                                        <Label text="Sá»‘ ngÃ y:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                                        <Label text="Số ngày:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                                                         <Spinner fx:id="spnEditDeliveryDays"
                                                                  editable="true"
                                                                  prefWidth="120.0"
@@ -173,7 +173,7 @@
                                                             </valueFactory>
                                                         </Spinner>
 
-                                                        <Label text="Tráº¡ng thÃ¡i:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                                                        <Label text="Trạng thái:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
                                                         <ComboBox fx:id="cboTransportStatus"
                                                                   prefWidth="160.0"
                                                                   GridPane.columnIndex="3"
@@ -187,7 +187,7 @@
                                                                 mnemonicParsing="false"
                                                                 onAction="#handleUpdateTransport"
                                                                 prefHeight="38.0"
-                                                                text="Cáº­p nháº­t thÃ´ng tin"
+                                                                text="Cập nhật thông tin"
                                                                 style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
                                                     </children>
                                                 </HBox>

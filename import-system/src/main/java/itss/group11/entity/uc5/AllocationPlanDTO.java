@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AllocationPlanDTO {
     private String requestCode;
-    private boolean isEnoughInventory; // true: Äá»§ hÃ ng, false: Bá»‹ thiáº¿u hÃ ng
+    private boolean isEnoughInventory; // true: Đủ hàng, false: Bị thiếu hàng
     private String message;
     private List<AllocationPlanItemDTO> planItems;
 }

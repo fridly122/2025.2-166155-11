@@ -25,8 +25,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InventoryManagementService {
 
-    private static final String IN_STOCK = "CÃ’N HÃ€NG";
-    private static final String OUT_OF_STOCK = "Háº¾T HÃ€NG";
+    private static final String IN_STOCK = "CÒN HÀNG";
+    private static final String OUT_OF_STOCK = "HẾT HÀNG";
 
     private final SiteInventoryRepository siteInventoryRepository;
     private final ImportSiteRepository importSiteRepository;
@@ -80,10 +80,10 @@ public class InventoryManagementService {
         String merchandiseCode = dto.getMerchandiseCode().trim().toUpperCase();
 
         ImportSite site = importSiteRepository.findBySiteCode(siteCode)
-                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y site: " + siteCode));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy site: " + siteCode));
 
         Merchandise merchandise = merchandiseRepository.findByCode(merchandiseCode)
-                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y máº·t hÃ ng: " + merchandiseCode));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy mặt hàng: " + merchandiseCode));
 
         SiteInventory inventory = siteInventoryRepository
                 .findBySiteCodeAndMerchandiseCode(siteCode, merchandiseCode)
@@ -100,19 +100,19 @@ public class InventoryManagementService {
 
     private void validateUpdateDTO(InventoryUpdateDTO dto) {
         if (dto == null) {
-            throw new RuntimeException("Dá»¯ liá»‡u tá»“n kho khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            throw new RuntimeException("Dữ liệu tồn kho không được để trống.");
         }
 
         if (dto.getSiteCode() == null || dto.getSiteCode().isBlank()) {
-            throw new RuntimeException("MÃ£ site khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            throw new RuntimeException("Mã site không được để trống.");
         }
 
         if (dto.getMerchandiseCode() == null || dto.getMerchandiseCode().isBlank()) {
-            throw new RuntimeException("MÃ£ máº·t hÃ ng khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            throw new RuntimeException("Mã mặt hàng không được để trống.");
         }
 
         if (dto.getInStockQuantity() == null || dto.getInStockQuantity() < 0) {
-            throw new RuntimeException("Sá»‘ lÆ°á»£ng tá»“n kho pháº£i lá»›n hÆ¡n hoáº·c báº±ng 0.");
+            throw new RuntimeException("Số lượng tồn kho phải lớn hơn hoặc bằng 0.");
         }
     }
 

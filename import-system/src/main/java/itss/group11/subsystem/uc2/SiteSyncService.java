@@ -36,9 +36,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SiteSyncService {
 
-    private static final String CLASS_ENOUGH = "Äá»¦ HÃ€NG";
-    private static final String CLASS_PARTIAL = "ÄÃP á»¨NG Má»˜T PHáº¦N";
-    private static final String CLASS_EMPTY = "CHÆ¯A CÃ“ Tá»’N KHO";
+    private static final String CLASS_ENOUGH = "ĐỦ HÀNG";
+    private static final String CLASS_PARTIAL = "ĐÁP ỨNG MỘT PHẦN";
+    private static final String CLASS_EMPTY = "CHƯA CÓ TỒN KHO";
 
     private final MerchandiseRepository merchandiseRepository;
     private final ImportSiteRepository importSiteRepository;
@@ -76,7 +76,7 @@ public class SiteSyncService {
     public OrderRequestClassificationDTO classifyOrderRequest(String requestCode) {
         OrderRequest request = findRequest(requestCode);
         if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new RuntimeException("YÃªu cáº§u nháº­p hÃ ng chÆ°a cÃ³ máº·t hÃ ng Ä‘á»ƒ phÃ¢n loáº¡i.");
+            throw new RuntimeException("Yêu cầu nhập hàng chưa có mặt hàng để phân loại.");
         }
 
         List<OrderRequestDetailDTO.ItemDTO> items = request.getItems()
@@ -126,7 +126,7 @@ public class SiteSyncService {
 
         for (Map.Entry<String, List<SiteClassificationResultDTO>> entry : resultsBySite.entrySet()) {
             ImportSite site = importSiteRepository.findBySiteCode(entry.getKey())
-                    .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y site: " + entry.getKey()));
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy site: " + entry.getKey()));
 
             InventoryInquiry inquiry = InventoryInquiry.builder()
                     .inquiryId(generateInquiryId())
@@ -150,9 +150,9 @@ public class SiteSyncService {
                 .itemCount(classification.getItemCount())
                 .siteCount(inquiryIds.size())
                 .inquiryIds(inquiryIds)
-                .message("ÄÃ£ lÆ°u " + inquiryIds.size()
-                        + " phiáº¿u há»i tá»“n kho cho yÃªu cáº§u " + classification.getRequestCode()
-                        + " vÃ o database.")
+                .message("Đã lưu " + inquiryIds.size()
+                        + " phiếu hỏi tồn kho cho yêu cầu " + classification.getRequestCode()
+                        + " vào database.")
                 .build();
     }
 
@@ -164,7 +164,7 @@ public class SiteSyncService {
         int requiredQuantity = requestDTO.getRequiredQuantity();
 
         Merchandise merchandise = merchandiseRepository.findByCode(merchandiseCode)
-                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y máº·t hÃ ng: " + merchandiseCode));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy mặt hàng: " + merchandiseCode));
 
         return classifyItem(merchandise, requiredQuantity);
     }
@@ -211,25 +211,25 @@ public class SiteSyncService {
 
     private void validateRequest(InventoryInquiryRequestDTO requestDTO) {
         if (requestDTO == null) {
-            throw new RuntimeException("Dá»¯ liá»‡u tÃ¬m kiáº¿m khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            throw new RuntimeException("Dữ liệu tìm kiếm không được để trống.");
         }
 
         if (requestDTO.getMerchandiseCode() == null || requestDTO.getMerchandiseCode().isBlank()) {
-            throw new RuntimeException("Vui lÃ²ng chá»n máº·t hÃ ng cáº§n tÃ¬m site.");
+            throw new RuntimeException("Vui lòng chọn mặt hàng cần tìm site.");
         }
 
         if (requestDTO.getRequiredQuantity() == null || requestDTO.getRequiredQuantity() <= 0) {
-            throw new RuntimeException("Sá»‘ lÆ°á»£ng cáº§n kiá»ƒm tra pháº£i lá»›n hÆ¡n 0.");
+            throw new RuntimeException("Số lượng cần kiểm tra phải lớn hơn 0.");
         }
     }
 
     private OrderRequest findRequest(String requestCode) {
         if (requestCode == null || requestCode.isBlank()) {
-            throw new RuntimeException("MÃ£ yÃªu cáº§u nháº­p hÃ ng khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            throw new RuntimeException("Mã yêu cầu nhập hàng không được để trống.");
         }
 
         return orderRequestRepository.findByRequestCode(requestCode.trim().toUpperCase())
-                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y yÃªu cáº§u nháº­p hÃ ng: " + requestCode));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu nhập hàng: " + requestCode));
     }
 
     private InventoryInquiryItem toInventoryInquiryItem(
@@ -237,7 +237,7 @@ public class SiteSyncService {
             SiteClassificationResultDTO result
     ) {
         Merchandise merchandise = merchandiseRepository.findByCode(result.getMerchandiseCode())
-                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y máº·t hÃ ng: "
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy mặt hàng: "
                         + result.getMerchandiseCode()));
 
         return InventoryInquiryItem.builder()
@@ -323,25 +323,25 @@ public class SiteSyncService {
             List<SiteClassificationResultDTO> results
     ) {
         if (results.isEmpty()) {
-            return "KhÃ´ng cÃ³ site nÃ o Ä‘ang kinh doanh máº·t hÃ ng " + merchandise.getCode() + ".";
+            return "Không có site nào đang kinh doanh mặt hàng " + merchandise.getCode() + ".";
         }
 
         if (totalStock >= requiredQuantity) {
-            return "Tá»•ng tá»“n kho Ä‘Ã¡p á»©ng Ä‘á»§ sá»‘ lÆ°á»£ng cáº§n kiá»ƒm tra.";
+            return "Tổng tồn kho đáp ứng đủ số lượng cần kiểm tra.";
         }
 
-        return "Tá»•ng tá»“n kho hiá»‡n cÃ³ chÆ°a Ä‘á»§. Cáº§n " + requiredQuantity
+        return "Tổng tồn kho hiện có chưa đủ. Cần " + requiredQuantity
                 + " " + nullToEmpty(merchandise.getUnit())
-                + ", hiá»‡n cÃ³ " + totalStock + ".";
+                + ", hiện có " + totalStock + ".";
     }
 
     private String buildRequestClassificationMessage(String requestCode, int itemCount, int siteCount) {
         if (siteCount == 0) {
-            return "KhÃ´ng tÃ¬m tháº¥y site nÃ o kinh doanh cÃ¡c máº·t hÃ ng trong yÃªu cáº§u " + requestCode + ".";
+            return "Không tìm thấy site nào kinh doanh các mặt hàng trong yêu cầu " + requestCode + ".";
         }
 
-        return "ÄÃ£ phÃ¢n loáº¡i " + itemCount + " máº·t hÃ ng trong yÃªu cáº§u " + requestCode
-                + " theo " + siteCount + " site phÃ¹ há»£p.";
+        return "Đã phân loại " + itemCount + " mặt hàng trong yêu cầu " + requestCode
+                + " theo " + siteCount + " site phù hợp.";
     }
 
     private OrderRequestSummaryDTO toRequestSummaryDTO(OrderRequest request) {

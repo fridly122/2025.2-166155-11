@@ -24,7 +24,7 @@ public class WarehouseController {
             return ResponseEntity.ok(inventoryManagementService.getInventoryRows());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch tá»“n kho: " + e.getMessage());
+                    .body("Không thể tải danh sách tồn kho: " + e.getMessage());
         }
     }
 
@@ -34,7 +34,7 @@ public class WarehouseController {
             return ResponseEntity.ok(inventoryManagementService.getInternalInventoryRows());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch tá»“n kho ná»™i bá»™: " + e.getMessage());
+                    .body("Không thể tải danh sách tồn kho nội bộ: " + e.getMessage());
         }
     }
 
@@ -44,7 +44,7 @@ public class WarehouseController {
             return ResponseEntity.ok(inventoryManagementService.getSiteOptions());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch site: " + e.getMessage());
+                    .body("Không thể tải danh sách site: " + e.getMessage());
         }
     }
 
@@ -54,7 +54,7 @@ public class WarehouseController {
             return ResponseEntity.ok(inventoryManagementService.getMerchandiseOptions());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch máº·t hÃ ng: " + e.getMessage());
+                    .body("Không thể tải danh sách mặt hàng: " + e.getMessage());
         }
     }
 
@@ -64,7 +64,7 @@ public class WarehouseController {
             return ResponseEntity.ok(inventoryManagementService.updateInventory(dto));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body("Cáº­p nháº­t tá»“n kho tháº¥t báº¡i: " + e.getMessage());
+                    .body("Cập nhật tồn kho thất bại: " + e.getMessage());
         }
     }
 }

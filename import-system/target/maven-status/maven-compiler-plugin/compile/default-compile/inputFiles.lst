@@ -1,88 +1,88 @@
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\chung\ApiConfig.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\chung\App.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\chung\AppFeature.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\chung\DashboardController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\chung\LoginController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\chung\LoginSession.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\chung\StageManager.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\chung\UserRole.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc1\OrderRequestController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc1\OrderRequestCreateController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc2\SiteClassificationController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc2\SiteSyncController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc3\SiteInventoryManageController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc3\WarehouseController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc4\SiteShippingManageController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc4\TransportController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc5\AllocationController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc5\AllocationListController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc6\HttpReconciliationApiClient.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc6\OrderReconciliationController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc6\PurchaseOrderController.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\controller\uc6\ReconciliationApiClient.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\DiscrepancyReport.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\ImportSite.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\InternalWarehouseInventory.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\InventoryInquiry.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\InventoryInquiryItem.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\Merchandise.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\OrderRequest.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\OrderRequestItem.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\PurchaseOrder.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\PurchaseOrderLine.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\SiteInventory.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\chung\TransportInfo.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc1\MerchandiseOptionDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc1\OrderRequestCreationDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc1\OrderRequestDetailDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc1\OrderRequestSummaryDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc2\InventoryInquiryRequestDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc2\InventoryInquiryResponseDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc2\InventoryInquirySendResultDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc2\OrderRequestClassificationDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc2\SiteClassificationResultDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc3\InternalInventoryRowDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc3\InventoryRowDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc3\InventoryUpdateDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc3\SiteOptionDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc4\PendingPurchaseOrderDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc4\TransportCreateDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc4\TransportDetailDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc4\TransportStatusUpdateDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc4\TransportUpdateDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc5\AllocationPlanDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc5\AllocationPlanItemDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc5\AllocationRequestRowDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc5\AllocationResultDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc5\SiteStockDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc6\PartialOrderSelectionDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc6\PurchaseOrderResponseDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc6\ReceivedLineDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc6\ReconciliationDetailDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc6\ReconciliationResultDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\entity\uc6\ReconciliationSubmitDTO.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\ImportSystemBackendApplication.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\DiscrepancyReportRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\ImportSiteRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\InternalWarehouseInventoryRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\InventoryInquiryRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\MerchandiseRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\OrderRequestItemRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\OrderRequestRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\PurchaseOrderLineRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\PurchaseOrderRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\SiteInventoryRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\chung\TransportRepository.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc1\OrderRequestService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc2\SiteSyncService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc3\InventoryManagementService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc4\TransportService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc5\AllocationService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc5\InventoryCheckService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc6\DiscrepancyReportService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc6\PurchaseOrderService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc6\RandomReportIdGenerator.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc6\ReconciliationValidator.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc6\ReportIdGenerator.java
-D:\2025.2-166155-11-1\import-system\src\main\java\itss\group11\subsystem\uc6\WarehouseInventoryService.java
-D:\2025.2-166155-11-1\import-system\src\main\java\module-info.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\chung\ApiConfig.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\chung\App.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\chung\AppFeature.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\chung\DashboardController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\chung\LoginController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\chung\LoginSession.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\chung\StageManager.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\chung\UserRole.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc1\OrderRequestController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc1\OrderRequestCreateController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc2\SiteClassificationController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc2\SiteSyncController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc3\SiteInventoryManageController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc3\WarehouseController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc4\SiteShippingManageController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc4\TransportController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc5\AllocationController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc5\AllocationListController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc6\HttpReconciliationApiClient.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc6\OrderReconciliationController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc6\PurchaseOrderController.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\controller\uc6\ReconciliationApiClient.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\DiscrepancyReport.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\ImportSite.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\InternalWarehouseInventory.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\InventoryInquiry.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\InventoryInquiryItem.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\Merchandise.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\OrderRequest.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\OrderRequestItem.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\PurchaseOrder.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\PurchaseOrderLine.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\SiteInventory.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\chung\TransportInfo.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc1\MerchandiseOptionDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc1\OrderRequestCreationDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc1\OrderRequestDetailDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc1\OrderRequestSummaryDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc2\InventoryInquiryRequestDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc2\InventoryInquiryResponseDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc2\InventoryInquirySendResultDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc2\OrderRequestClassificationDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc2\SiteClassificationResultDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc3\InternalInventoryRowDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc3\InventoryRowDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc3\InventoryUpdateDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc3\SiteOptionDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc4\PendingPurchaseOrderDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc4\TransportCreateDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc4\TransportDetailDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc4\TransportStatusUpdateDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc4\TransportUpdateDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc5\AllocationPlanDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc5\AllocationPlanItemDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc5\AllocationRequestRowDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc5\AllocationResultDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc5\SiteStockDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc6\PartialOrderSelectionDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc6\PurchaseOrderResponseDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc6\ReceivedLineDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc6\ReconciliationDetailDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc6\ReconciliationResultDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\entity\uc6\ReconciliationSubmitDTO.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\ImportSystemBackendApplication.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\DiscrepancyReportRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\ImportSiteRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\InternalWarehouseInventoryRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\InventoryInquiryRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\MerchandiseRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\OrderRequestItemRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\OrderRequestRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\PurchaseOrderLineRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\PurchaseOrderRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\SiteInventoryRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\chung\TransportRepository.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc1\OrderRequestService.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc2\SiteSyncService.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc3\InventoryManagementService.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc4\TransportService.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc5\AllocationService.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc5\InventoryCheckService.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc6\DiscrepancyReportService.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc6\PurchaseOrderService.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc6\RandomReportIdGenerator.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc6\ReconciliationValidator.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc6\ReportIdGenerator.java
+G:\hieu\ITSS Project\import-system\src\main\java\itss\group11\subsystem\uc6\WarehouseInventoryService.java
+G:\hieu\ITSS Project\import-system\src\main\java\module-info.java

@@ -122,8 +122,8 @@ public class SiteShippingManageController {
         setupPendingOrderTable();
         setupTransportTable();
 
-        pendingOrderTable.setPlaceholder(new Label("KhÃ´ng cÃ³ Ä‘Æ¡n hÃ ng CREATED chá» váº­n chuyá»ƒn."));
-        transportTable.setPlaceholder(new Label("ChÆ°a cÃ³ thÃ´ng tin váº­n chuyá»ƒn."));
+        pendingOrderTable.setPlaceholder(new Label("Không có đơn hàng CREATED chờ vận chuyển."));
+        transportTable.setPlaceholder(new Label("Chưa có thông tin vận chuyển."));
 
         cboVehicle.setItems(FXCollections.observableArrayList(VEHICLE_AIR, VEHICLE_SHIP, VEHICLE_TRUCK));
         cboEditVehicle.setItems(FXCollections.observableArrayList(VEHICLE_AIR, VEHICLE_SHIP, VEHICLE_TRUCK));
@@ -154,7 +154,7 @@ public class SiteShippingManageController {
         PendingOrderRow selected = pendingOrderTable.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            showWarning("ChÆ°a chá»n Ä‘Æ¡n hÃ ng", "Vui lÃ²ng chá»n má»™t Ä‘Æ¡n hÃ ng trÆ°á»›c khi táº¡o váº­n chuyá»ƒn.");
+            showWarning("Chưa chọn đơn hàng", "Vui lòng chọn một đơn hàng trước khi tạo vận chuyển.");
             return;
         }
 
@@ -163,17 +163,17 @@ public class SiteShippingManageController {
         Integer deliveryDays = spnDeliveryDays.getValue();
 
         if (destinationSite == null || destinationSite.isBlank()) {
-            showWarning("Thiáº¿u thÃ´ng tin", "Site Ä‘Ã­ch khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            showWarning("Thiếu thông tin", "Site đích không được để trống.");
             return;
         }
 
         if (vehicle == null || vehicle.isBlank()) {
-            showWarning("Thiáº¿u thÃ´ng tin", "PhÆ°Æ¡ng tiá»‡n váº­n chuyá»ƒn khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            showWarning("Thiếu thông tin", "Phương tiện vận chuyển không được để trống.");
             return;
         }
 
         if (deliveryDays == null || deliveryDays <= 0 || deliveryDays > 365) {
-            showWarning("Dá»¯ liá»‡u khÃ´ng há»£p lá»‡", "Sá»‘ ngÃ y váº­n chuyá»ƒn pháº£i lá»›n hÆ¡n 0 vÃ  khÃ´ng quÃ¡ 365.");
+            showWarning("Dữ liệu không hợp lệ", "Số ngày vận chuyển phải lớn hơn 0 và không quá 365.");
             return;
         }
 
@@ -201,24 +201,24 @@ public class SiteShippingManageController {
                         objectMapper.readValue(response.body(), TransportDetailDTO.class);
 
                 showInfo(
-                        "Táº¡o váº­n chuyá»ƒn thÃ nh cÃ´ng",
-                        "ÄÃ£ táº¡o váº­n chuyá»ƒn cho Ä‘Æ¡n hÃ ng " + result.getOrderId()
-                                + "\nTráº¡ng thÃ¡i váº­n chuyá»ƒn: " + result.getTransportStatus()
-                                + "\nTráº¡ng thÃ¡i PO: " + result.getPurchaseOrderStatus()
+                        "Tạo vận chuyển thành công",
+                        "Đã tạo vận chuyển cho đơn hàng " + result.getOrderId()
+                                + "\nTrạng thái vận chuyển: " + result.getTransportStatus()
+                                + "\nTrạng thái PO: " + result.getPurchaseOrderStatus()
                 );
 
                 clearCreateForm();
                 loadPendingOrders();
                 loadTransports();
             } else {
-                showError("Táº¡o váº­n chuyá»ƒn tháº¥t báº¡i", response.body());
+                showError("Tạo vận chuyển thất bại", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API táº¡o váº­n chuyá»ƒn: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API tạo vận chuyển: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API táº¡o váº­n chuyá»ƒn: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API tạo vận chuyển: " + e.getMessage());
         }
     }
 
@@ -231,27 +231,27 @@ public class SiteShippingManageController {
         Integer deliveryDays = spnEditDeliveryDays.getValue();
 
         if (selected == null) {
-            showWarning("ChÆ°a chá»n váº­n chuyá»ƒn", "Vui lÃ²ng chá»n má»™t dÃ²ng váº­n chuyá»ƒn trÆ°á»›c khi cáº­p nháº­t.");
+            showWarning("Chưa chọn vận chuyển", "Vui lòng chọn một dòng vận chuyển trước khi cập nhật.");
             return;
         }
 
         if (destinationSite == null || destinationSite.isBlank()) {
-            showWarning("Thiáº¿u thÃ´ng tin", "Site Ä‘Ã­ch khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            showWarning("Thiếu thông tin", "Site đích không được để trống.");
             return;
         }
 
         if (vehicle == null || vehicle.isBlank()) {
-            showWarning("Thiáº¿u thÃ´ng tin", "PhÆ°Æ¡ng tiá»‡n váº­n chuyá»ƒn khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            showWarning("Thiếu thông tin", "Phương tiện vận chuyển không được để trống.");
             return;
         }
 
         if (deliveryDays == null || deliveryDays <= 0 || deliveryDays > 365) {
-            showWarning("Dá»¯ liá»‡u khÃ´ng há»£p lá»‡", "Sá»‘ ngÃ y váº­n chuyá»ƒn pháº£i lá»›n hÆ¡n 0 vÃ  khÃ´ng quÃ¡ 365.");
+            showWarning("Dữ liệu không hợp lệ", "Số ngày vận chuyển phải lớn hơn 0 và không quá 365.");
             return;
         }
 
         if (newStatus == null || newStatus.isBlank()) {
-            showWarning("ChÆ°a chá»n tráº¡ng thÃ¡i", "Vui lÃ²ng chá»n tráº¡ng thÃ¡i váº­n chuyá»ƒn má»›i.");
+            showWarning("Chưa chọn trạng thái", "Vui lòng chọn trạng thái vận chuyển mới.");
             return;
         }
 
@@ -278,23 +278,23 @@ public class SiteShippingManageController {
                         objectMapper.readValue(response.body(), TransportDetailDTO.class);
 
                 showInfo(
-                        "Cáº­p nháº­t váº­n chuyá»ƒn thÃ nh cÃ´ng",
-                        "MÃ£ PO: " + result.getOrderId()
-                                + "\nTráº¡ng thÃ¡i váº­n chuyá»ƒn: " + result.getTransportStatus()
-                                + "\nTráº¡ng thÃ¡i PO: " + result.getPurchaseOrderStatus()
+                        "Cập nhật vận chuyển thành công",
+                        "Mã PO: " + result.getOrderId()
+                                + "\nTrạng thái vận chuyển: " + result.getTransportStatus()
+                                + "\nTrạng thái PO: " + result.getPurchaseOrderStatus()
                 );
 
                 loadTransports();
                 loadPendingOrders();
             } else {
-                showError("Cáº­p nháº­t váº­n chuyá»ƒn tháº¥t báº¡i", response.body());
+                showError("Cập nhật vận chuyển thất bại", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API cáº­p nháº­t váº­n chuyá»ƒn: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API cập nhật vận chuyển: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API cáº­p nháº­t váº­n chuyá»ƒn: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API cập nhật vận chuyển: " + e.getMessage());
         }
     }
 
@@ -354,14 +354,14 @@ public class SiteShippingManageController {
                                 .toList()
                 ));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch Ä‘Æ¡n hÃ ng", response.body());
+                showError("Không thể tải danh sách đơn hàng", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch Ä‘Æ¡n hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách đơn hàng: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch Ä‘Æ¡n hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách đơn hàng: " + e.getMessage());
         }
     }
 
@@ -385,14 +385,14 @@ public class SiteShippingManageController {
                                 .toList()
                 ));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch váº­n chuyá»ƒn", response.body());
+                showError("Không thể tải danh sách vận chuyển", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch váº­n chuyá»ƒn: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách vận chuyển: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch váº­n chuyá»ƒn: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách vận chuyển: " + e.getMessage());
         }
     }
 
@@ -411,15 +411,15 @@ public class SiteShippingManageController {
 
     private void updateSelectedOrderLabel(PendingOrderRow selected) {
         if (selected == null) {
-            lblSelectedOrder.setText("ChÆ°a chá»n Ä‘Æ¡n hÃ ng");
+            lblSelectedOrder.setText("Chưa chọn đơn hàng");
         } else {
-            lblSelectedOrder.setText("Äang chá»n: " + selected.getOrderId() + " | " + selected.getSourceSite());
+            lblSelectedOrder.setText("Đang chọn: " + selected.getOrderId() + " | " + selected.getSourceSite());
         }
     }
 
     private void updateSelectedTransportLabel(TransportRow selected) {
         if (selected == null) {
-            lblSelectedTransport.setText("ChÆ°a chá»n thÃ´ng tin váº­n chuyá»ƒn");
+            lblSelectedTransport.setText("Chưa chọn thông tin vận chuyển");
             txtEditDestinationSite.clear();
             cboEditVehicle.getSelectionModel().clearSelection();
             spnEditDeliveryDays.getValueFactory().setValue(1);
@@ -428,7 +428,7 @@ public class SiteShippingManageController {
         }
 
         lblSelectedTransport.setText(
-                "Äang chá»n: " + selected.getOrderId()
+                "Đang chọn: " + selected.getOrderId()
                 + " | " + selected.getSourceSite()
                         + " -> " + selected.getDestinationSite()
         );
@@ -443,7 +443,7 @@ public class SiteShippingManageController {
         cboVehicle.getSelectionModel().select(VEHICLE_AIR);
         spnDeliveryDays.getValueFactory().setValue(1);
         pendingOrderTable.getSelectionModel().clearSelection();
-        lblSelectedOrder.setText("ChÆ°a chá»n Ä‘Æ¡n hÃ ng");
+        lblSelectedOrder.setText("Chưa chọn đơn hàng");
     }
 
     private void selectVehicle(ComboBox<String> comboBox, String vehicle) {

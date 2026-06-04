@@ -7,25 +7,25 @@ import java.util.Set;
 public enum UserRole {
     SALES(
             "sales",
-            "Bá»™ pháº­n bÃ¡n hÃ ng",
+            "Bộ phận bán hàng",
             AppFeature.CREATE_REQUEST,
             EnumSet.of(AppFeature.CREATE_REQUEST)
     ),
     INTERNATIONAL_ORDER(
             "order",
-            "Bá»™ pháº­n Ä‘áº·t hÃ ng quá»‘c táº¿",
+            "Bộ phận đặt hàng quốc tế",
             AppFeature.CLASSIFICATION,
             EnumSet.of(AppFeature.CLASSIFICATION, AppFeature.SHIPPING, AppFeature.ALLOCATION)
     ),
     SITE(
             "site",
-            "Site nháº­p kháº©u",
+            "Site nhập khẩu",
             AppFeature.INVENTORY,
             EnumSet.of(AppFeature.INVENTORY)
     ),
     WAREHOUSE(
             "warehouse",
-            "Bá»™ pháº­n quáº£n lÃ½ kho",
+            "Bộ phận quản lý kho",
             AppFeature.RECONCILIATION,
             EnumSet.of(AppFeature.RECONCILIATION)
     );

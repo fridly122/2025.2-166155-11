@@ -15,7 +15,7 @@ public class DiscrepancyReport {
 
     @Id
     @Column(name = "report_id", length = 50)
-    private String reportId;            // MÃ£ biÃªn báº£n
+    private String reportId;            // Mã biên bản
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
@@ -26,16 +26,16 @@ public class DiscrepancyReport {
     private Merchandise merchandise;
 
     @Column(name = "ordered_qty", nullable = false)
-    private Integer orderedQty;         // Sá»‘ lÆ°á»£ng Ä‘áº·t
+    private Integer orderedQty;         // Số lượng đặt
 
     @Column(name = "received_qty", nullable = false)
-    private Integer receivedQty;        // Sá»‘ lÆ°á»£ng thá»±c nháº­n (>= 0)
+    private Integer receivedQty;        // Số lượng thực nhận (>= 0)
 
     @Column(name = "difference_qty", nullable = false)
-    private Integer differenceQty;      // ChÃªnh lá»‡ch = orderedQty - receivedQty
+    private Integer differenceQty;      // Chênh lệch = orderedQty - receivedQty
 
     @Column(name = "reason", length = 500)
-    private String reason;              // LÃ½ do sai lá»‡ch
+    private String reason;              // Lý do sai lệch
 
     @Column(name = "note", length = 1000)
     private String note;

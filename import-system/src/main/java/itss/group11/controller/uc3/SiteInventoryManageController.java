@@ -83,8 +83,8 @@ public class SiteInventoryManageController {
         setupComboBoxes();
         setupInventoryTable();
 
-        inventoryTable.setPlaceholder(new Label("ChÆ°a cÃ³ dá»¯ liá»‡u tá»“n kho."));
-        lblSelectedInventory.setText("ChÆ°a chá»n dÃ²ng tá»“n kho.");
+        inventoryTable.setPlaceholder(new Label("Chưa có dữ liệu tồn kho."));
+        lblSelectedInventory.setText("Chưa chọn dòng tồn kho.");
 
         inventoryTable.getSelectionModel()
                 .selectedItemProperty()
@@ -108,17 +108,17 @@ public class SiteInventoryManageController {
         Integer quantity = spnInStockQuantity.getValue();
 
         if (selectedSite == null) {
-            showWarning("ChÆ°a chá»n site", "Vui lÃ²ng chá»n site cáº§n cáº­p nháº­t tá»“n kho.");
+            showWarning("Chưa chọn site", "Vui lòng chọn site cần cập nhật tồn kho.");
             return;
         }
 
         if (selectedMerchandise == null) {
-            showWarning("ChÆ°a chá»n máº·t hÃ ng", "Vui lÃ²ng chá»n máº·t hÃ ng cáº§n cáº­p nháº­t tá»“n kho.");
+            showWarning("Chưa chọn mặt hàng", "Vui lòng chọn mặt hàng cần cập nhật tồn kho.");
             return;
         }
 
         if (quantity == null || quantity < 0) {
-            showWarning("Sá»‘ lÆ°á»£ng khÃ´ng há»£p lá»‡", "Sá»‘ lÆ°á»£ng tá»“n kho pháº£i lá»›n hÆ¡n hoáº·c báº±ng 0.");
+            showWarning("Số lượng không hợp lệ", "Số lượng tồn kho phải lớn hơn hoặc bằng 0.");
             return;
         }
 
@@ -145,23 +145,23 @@ public class SiteInventoryManageController {
                         objectMapper.readValue(response.body(), InventoryRowDTO.class);
 
                 showInfo(
-                        "Cáº­p nháº­t tá»“n kho thÃ nh cÃ´ng",
+                        "Cập nhật tồn kho thành công",
                         result.getSiteCode() + " - " + result.getMerchandiseCode()
-                                + "\nSá»‘ lÆ°á»£ng tá»“n: " + result.getInStockQuantity()
-                                + "\nTráº¡ng thÃ¡i: " + result.getStockStatus()
+                                + "\nSố lượng tồn: " + result.getInStockQuantity()
+                                + "\nTrạng thái: " + result.getStockStatus()
                 );
 
                 loadInventoryRows();
                 selectUpdatedRow(result);
             } else {
-                showError("Cáº­p nháº­t tá»“n kho tháº¥t báº¡i", response.body());
+                showError("Cập nhật tồn kho thất bại", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API cáº­p nháº­t tá»“n kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API cập nhật tồn kho: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API cáº­p nháº­t tá»“n kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API cập nhật tồn kho: " + e.getMessage());
         }
     }
 
@@ -231,14 +231,14 @@ public class SiteInventoryManageController {
 
                 cboSite.setItems(FXCollections.observableArrayList(sites));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch site", response.body());
+                showError("Không thể tải danh sách site", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch site: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách site: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch site: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách site: " + e.getMessage());
         }
     }
 
@@ -258,14 +258,14 @@ public class SiteInventoryManageController {
 
                 cboMerchandise.setItems(FXCollections.observableArrayList(merchandise));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch máº·t hÃ ng", response.body());
+                showError("Không thể tải danh sách mặt hàng", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch máº·t hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách mặt hàng: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch máº·t hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách mặt hàng: " + e.getMessage());
         }
     }
 
@@ -289,14 +289,14 @@ public class SiteInventoryManageController {
                                 .toList()
                 ));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch tá»“n kho", response.body());
+                showError("Không thể tải danh sách tồn kho", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch tá»“n kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách tồn kho: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch tá»“n kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách tồn kho: " + e.getMessage());
         }
     }
 
@@ -315,12 +315,12 @@ public class SiteInventoryManageController {
 
     private void fillFormFromSelectedRow(InventoryRow selected) {
         if (selected == null) {
-            lblSelectedInventory.setText("ChÆ°a chá»n dÃ²ng tá»“n kho.");
+            lblSelectedInventory.setText("Chưa chọn dòng tồn kho.");
             return;
         }
 
         lblSelectedInventory.setText(
-                "Äang chá»n: " + selected.getSiteCode()
+                "Đang chọn: " + selected.getSiteCode()
                         + " | " + selected.getMerchandiseCode()
                         + " | " + selected.getStockStatus()
         );
@@ -370,7 +370,7 @@ public class SiteInventoryManageController {
         cboMerchandise.getSelectionModel().clearSelection();
         spnInStockQuantity.getValueFactory().setValue(0);
         inventoryTable.getSelectionModel().clearSelection();
-        lblSelectedInventory.setText("ChÆ°a chá»n dÃ²ng tá»“n kho.");
+        lblSelectedInventory.setText("Chưa chọn dòng tồn kho.");
     }
 
     private void showInfo(String title, String content) {

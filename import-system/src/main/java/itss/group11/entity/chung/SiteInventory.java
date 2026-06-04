@@ -34,5 +34,5 @@ public class SiteInventory {
     @JoinColumn(name = "merchandise_code", referencedColumnName = "code", nullable = false)
     private Merchandise merchandise;
     @Column(name = "in_stock_quantity", nullable = false)
-    private Integer inStockQuantity; // Sá»‘ lÆ°á»£ng tá»“n kho thá»±c táº¿
+    private Integer inStockQuantity; // Số lượng tồn kho thực tế
 }

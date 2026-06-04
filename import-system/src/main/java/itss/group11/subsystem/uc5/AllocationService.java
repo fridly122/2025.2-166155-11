@@ -85,7 +85,7 @@ public class AllocationService {
                 .requestCode(requestCode)
                 .isEnoughInventory(isStockEnough)
                 .planItems(planItems)
-                .message(isStockEnough ? "Káº¿ hoáº¡ch kháº£ thi." : "Cáº£nh bÃ¡o: KhÃ´ng Ä‘á»§ tá»“n kho!")
+                .message(isStockEnough ? "Kế hoạch khả thi." : "Cảnh báo: Không đủ tồn kho!")
                 .build();
     }
 
@@ -105,21 +105,21 @@ public class AllocationService {
         return AllocationResultDTO.builder()
                 .requestCode(requestCode)
                 .isSuccess(true)
-                .message("PhÃ¢n bá»• thÃ nh cÃ´ng! ÄÃ£ táº¡o " + poCodes.size() + " Ä‘Æ¡n PO.")
+                .message("Phân bổ thành công! Đã tạo " + poCodes.size() + " đơn PO.")
                 .generatedPoCodes(poCodes)
                 .build();
     }
 
     private OrderRequest findPendingRequest(String requestCode) {
         OrderRequest request = orderRequestRepository.findByRequestCode(requestCode)
-                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y yÃªu cáº§u nháº­p hÃ ng: " + requestCode));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu nhập hàng: " + requestCode));
 
         if (request.getStatus() != OrderRequest.OrderRequestStatus.PENDING) {
-            throw new RuntimeException("YÃªu cáº§u nÃ y khÃ´ng á»Ÿ tráº¡ng thÃ¡i PENDING.");
+            throw new RuntimeException("Yêu cầu này không ở trạng thái PENDING.");
         }
 
         if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new RuntimeException("YÃªu cáº§u nháº­p hÃ ng chÆ°a cÃ³ máº·t hÃ ng.");
+            throw new RuntimeException("Yêu cầu nhập hàng chưa có mặt hàng.");
         }
 
         return request;
@@ -158,7 +158,7 @@ public class AllocationService {
 
                 PurchaseOrder sitePo = poGroupedBySite.computeIfAbsent(siteCode, key -> {
                     ImportSite site = importSiteRepository.findBySiteCode(key)
-                            .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y Site cáº¥u hÃ¬nh: " + key));
+                            .orElseThrow(() -> new RuntimeException("Không tìm thấy Site cấu hình: " + key));
 
                     return PurchaseOrder.builder()
                             .orderId(generateUniquePoCode())
@@ -182,7 +182,7 @@ public class AllocationService {
             }
 
             if (remainingQtyToFulfill > 0) {
-                throw new RuntimeException("KhÃ´ng Ä‘á»§ hÃ ng cho máº·t hÃ ng: " + merchandise.getCode());
+                throw new RuntimeException("Không đủ hàng cho mặt hàng: " + merchandise.getCode());
             }
         }
 

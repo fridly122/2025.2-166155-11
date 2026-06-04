@@ -29,7 +29,7 @@ public class App extends Application {
 
         StageManager.switchScene(
                 "/itss/group11/view/chung/login.fxml",
-                "ÄÄƒng nháº­p - Há»‡ thá»‘ng Äáº·t hÃ ng Nháº­p kháº©u"
+                "Đăng nhập - Hệ thống Đặt hàng Nhập khẩu"
         );
     }
 

@@ -62,7 +62,7 @@ public class AllocationListController {
         colDate.setCellValueFactory(data ->
                 new SimpleStringProperty(data.getValue().getCreatedDate()));
 
-        requestTable.setPlaceholder(new Label("ChÆ°a cÃ³ yÃªu cáº§u PENDING chá» láº­p káº¿ hoáº¡ch."));
+        requestTable.setPlaceholder(new Label("Chưa có yêu cầu PENDING chờ lập kế hoạch."));
 
         btnPreview.disableProperty().bind(requestTable.getSelectionModel().selectedItemProperty().isNull());
         btnProcess.disableProperty().bind(requestTable.getSelectionModel().selectedItemProperty().isNull());
@@ -93,14 +93,14 @@ public class AllocationListController {
                                 .toList()
                 ));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch yÃªu cáº§u", response.body());
+                showError("Không thể tải danh sách yêu cầu", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch yÃªu cáº§u: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách yêu cầu: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch yÃªu cáº§u: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách yêu cầu: " + e.getMessage());
         }
     }
 
@@ -109,7 +109,7 @@ public class AllocationListController {
         RequestRow selected = requestTable.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            showWarning("ChÆ°a chá»n yÃªu cáº§u", "Vui lÃ²ng chá»n má»™t yÃªu cáº§u nháº­p hÃ ng trÆ°á»›c khi xem trÆ°á»›c káº¿ hoáº¡ch.");
+            showWarning("Chưa chọn yêu cầu", "Vui lòng chọn một yêu cầu nhập hàng trước khi xem trước kế hoạch.");
             return;
         }
 
@@ -130,14 +130,14 @@ public class AllocationListController {
                 AllocationPlanDTO plan = objectMapper.readValue(response.body(), AllocationPlanDTO.class);
                 showPreviewDialog(plan);
             } else {
-                showError("KhÃ´ng thá»ƒ xem trÆ°á»›c káº¿ hoáº¡ch", response.body());
+                showError("Không thể xem trước kế hoạch", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API preview: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API preview: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API preview: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API preview: " + e.getMessage());
         }
     }
 
@@ -146,16 +146,16 @@ public class AllocationListController {
         RequestRow selected = requestTable.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            showWarning("ChÆ°a chá»n yÃªu cáº§u", "Vui lÃ²ng chá»n má»™t yÃªu cáº§u nháº­p hÃ ng trÆ°á»›c khi xá»­ lÃ½ láº­p káº¿ hoáº¡ch.");
+            showWarning("Chưa chọn yêu cầu", "Vui lòng chọn một yêu cầu nhập hàng trước khi xử lý lập kế hoạch.");
             return;
         }
 
         String requestCode = selected.getRequestCode();
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("XÃ¡c nháº­n xá»­ lÃ½");
-        confirm.setHeaderText("Xá»­ lÃ½ láº­p káº¿ hoáº¡ch cho yÃªu cáº§u: " + requestCode);
-        confirm.setContentText("Sau khi xá»­ lÃ½, há»‡ thá»‘ng sáº½ táº¡o Ä‘Æ¡n PO vÃ  cáº­p nháº­t tráº¡ng thÃ¡i yÃªu cáº§u. Báº¡n cÃ³ cháº¯c muá»‘n tiáº¿p tá»¥c?");
+        confirm.setTitle("Xác nhận xử lý");
+        confirm.setHeaderText("Xử lý lập kế hoạch cho yêu cầu: " + requestCode);
+        confirm.setContentText("Sau khi xử lý, hệ thống sẽ tạo đơn PO và cập nhật trạng thái yêu cầu. Bạn có chắc muốn tiếp tục?");
 
         ButtonType result = confirm.showAndWait().orElse(ButtonType.CANCEL);
 
@@ -178,17 +178,17 @@ public class AllocationListController {
                 AllocationResultDTO allocationResult =
                         objectMapper.readValue(response.body(), AllocationResultDTO.class);
 
-                showInfo("Xá»­ lÃ½ thÃ nh cÃ´ng", buildProcessSuccessMessage(allocationResult));
+                showInfo("Xử lý thành công", buildProcessSuccessMessage(allocationResult));
                 loadPendingRequests();
             } else {
-                showError("Xá»­ lÃ½ tháº¥t báº¡i", response.body());
+                showError("Xử lý thất bại", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API process: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API process: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API process: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API process: " + e.getMessage());
         }
     }
 
@@ -196,24 +196,24 @@ public class AllocationListController {
         StringBuilder builder = new StringBuilder();
 
         builder.append(plan.getMessage()).append("\n\n");
-        builder.append("MÃ£ yÃªu cáº§u: ").append(plan.getRequestCode()).append("\n");
-        builder.append("TÃ¬nh tráº¡ng tá»“n kho: ")
-                .append(plan.isEnoughInventory() ? "Äá»§ hÃ ng" : "KhÃ´ng Ä‘á»§ hÃ ng")
+        builder.append("Mã yêu cầu: ").append(plan.getRequestCode()).append("\n");
+        builder.append("Tình trạng tồn kho: ")
+                .append(plan.isEnoughInventory() ? "Đủ hàng" : "Không đủ hàng")
                 .append("\n\n");
 
         if (plan.getPlanItems() == null || plan.getPlanItems().isEmpty()) {
-            builder.append("KhÃ´ng cÃ³ dÃ²ng phÃ¢n bá»• nÃ o.");
+            builder.append("Không có dòng phân bổ nào.");
         } else {
-            builder.append("Danh sÃ¡ch phÃ¢n bá»• dá»± kiáº¿n:\n");
+            builder.append("Danh sách phân bổ dự kiến:\n");
 
             for (AllocationPlanItemDTO item : plan.getPlanItems()) {
-                builder.append("- Máº·t hÃ ng: ")
+                builder.append("- Mặt hàng: ")
                         .append(item.getMerchandiseCode())
                         .append(" | Site: ")
                         .append(item.getSiteCode())
                         .append(" - ")
                         .append(item.getSiteName())
-                        .append(" | SL phÃ¢n bá»•: ")
+                        .append(" | SL phân bổ: ")
                         .append(item.getAllocatedQuantity())
                         .append(" | VC: ")
                         .append(item.getDeliveryMeans() == null ? "" : item.getDeliveryMeans())
@@ -221,17 +221,17 @@ public class AllocationListController {
             }
         }
 
-        showInfo("Xem trÆ°á»›c káº¿ hoáº¡ch", builder.toString());
+        showInfo("Xem trước kế hoạch", builder.toString());
     }
 
     private String buildProcessSuccessMessage(AllocationResultDTO result) {
         StringBuilder builder = new StringBuilder();
 
         builder.append(result.getMessage()).append("\n\n");
-        builder.append("MÃ£ yÃªu cáº§u: ").append(result.getRequestCode()).append("\n");
+        builder.append("Mã yêu cầu: ").append(result.getRequestCode()).append("\n");
 
         if (result.getGeneratedPoCodes() != null && !result.getGeneratedPoCodes().isEmpty()) {
-            builder.append("CÃ¡c Ä‘Æ¡n PO Ä‘Ã£ táº¡o:\n");
+            builder.append("Các đơn PO đã tạo:\n");
             for (String poCode : result.getGeneratedPoCodes()) {
                 builder.append("- ").append(poCode).append("\n");
             }

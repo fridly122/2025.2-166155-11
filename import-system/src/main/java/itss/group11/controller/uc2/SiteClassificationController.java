@@ -111,10 +111,10 @@ public class SiteClassificationController {
         setupItemTable();
         setupResultTable();
 
-        requestTable.setPlaceholder(new Label("KhÃ´ng cÃ³ yÃªu cáº§u PENDING cáº§n phÃ¢n loáº¡i."));
-        itemTable.setPlaceholder(new Label("Chá»n má»™t yÃªu cáº§u Ä‘á»ƒ xem danh sÃ¡ch máº·t hÃ ng."));
-        resultTable.setPlaceholder(new Label("Báº¥m Báº¯t Ä‘áº§u phÃ¢n loáº¡i Ä‘á»ƒ xem káº¿t quáº£."));
-        lblSummary.setText("ChÆ°a cÃ³ káº¿t quáº£ phÃ¢n loáº¡i.");
+        requestTable.setPlaceholder(new Label("Không có yêu cầu PENDING cần phân loại."));
+        itemTable.setPlaceholder(new Label("Chọn một yêu cầu để xem danh sách mặt hàng."));
+        resultTable.setPlaceholder(new Label("Bấm Bắt đầu phân loại để xem kết quả."));
+        lblSummary.setText("Chưa có kết quả phân loại.");
 
         btnClassify.disableProperty().bind(requestTable.getSelectionModel().selectedItemProperty().isNull());
         btnSendInquiry.disableProperty().bind(resultTable.itemsProperty().isNull());
@@ -136,7 +136,7 @@ public class SiteClassificationController {
     private void handleClassify() {
         RequestRow selected = requestTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showWarning("ChÆ°a chá»n yÃªu cáº§u", "Vui lÃ²ng chá»n má»™t yÃªu cáº§u nháº­p hÃ ng trÆ°á»›c khi phÃ¢n loáº¡i.");
+            showWarning("Chưa chọn yêu cầu", "Vui lòng chọn một yêu cầu nhập hàng trước khi phân loại.");
             return;
         }
 
@@ -157,14 +157,14 @@ public class SiteClassificationController {
 
                 renderClassificationResult(result);
             } else {
-                showError("PhÃ¢n loáº¡i tháº¥t báº¡i", response.body());
+                showError("Phân loại thất bại", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API phÃ¢n loáº¡i: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API phân loại: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API phÃ¢n loáº¡i: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API phân loại: " + e.getMessage());
         }
     }
 
@@ -172,7 +172,7 @@ public class SiteClassificationController {
     private void handleSendInquiry() {
         RequestRow selected = requestTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showWarning("ChÆ°a chá»n yÃªu cáº§u", "Vui lÃ²ng chá»n má»™t yÃªu cáº§u nháº­p hÃ ng trÆ°á»›c khi gá»­i há»i tá»“n kho.");
+            showWarning("Chưa chọn yêu cầu", "Vui lòng chọn một yêu cầu nhập hàng trước khi gửi hỏi tồn kho.");
             return;
         }
 
@@ -191,16 +191,16 @@ public class SiteClassificationController {
                 InventoryInquirySendResultDTO result =
                         objectMapper.readValue(response.body(), InventoryInquirySendResultDTO.class);
 
-                showInfo("Gá»­i yÃªu cáº§u há»i tá»“n kho thÃ nh cÃ´ng", result.getMessage());
+                showInfo("Gửi yêu cầu hỏi tồn kho thành công", result.getMessage());
             } else {
-                showError("Gá»­i yÃªu cáº§u há»i tá»“n kho tháº¥t báº¡i", response.body());
+                showError("Gửi yêu cầu hỏi tồn kho thất bại", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API gá»­i há»i tá»“n kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API gửi hỏi tồn kho: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API gá»­i há»i tá»“n kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API gửi hỏi tồn kho: " + e.getMessage());
         }
     }
 
@@ -255,20 +255,20 @@ public class SiteClassificationController {
                                 .toList()
                 ));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch yÃªu cáº§u", response.body());
+                showError("Không thể tải danh sách yêu cầu", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch yÃªu cáº§u: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách yêu cầu: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch yÃªu cáº§u: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách yêu cầu: " + e.getMessage());
         }
     }
 
     private void handleRequestSelected(RequestRow selected) {
         resultTable.setItems(FXCollections.observableArrayList());
-        lblSummary.setText("ChÆ°a cÃ³ káº¿t quáº£ phÃ¢n loáº¡i.");
+        lblSummary.setText("Chưa có kết quả phân loại.");
 
         if (selected == null) {
             itemTable.setItems(FXCollections.observableArrayList());
@@ -298,14 +298,14 @@ public class SiteClassificationController {
                                 : detail.getItems().stream().map(this::toRequestItemRow).toList()
                 ));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i chi tiáº¿t yÃªu cáº§u", response.body());
+                showError("Không thể tải chi tiết yêu cầu", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API chi tiáº¿t yÃªu cáº§u: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API chi tiết yêu cầu: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API chi tiáº¿t yÃªu cáº§u: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API chi tiết yêu cầu: " + e.getMessage());
         }
     }
 
@@ -345,7 +345,7 @@ public class SiteClassificationController {
     private void clearDetails() {
         itemTable.setItems(FXCollections.observableArrayList());
         resultTable.setItems(FXCollections.observableArrayList());
-        lblSummary.setText("ChÆ°a cÃ³ káº¿t quáº£ phÃ¢n loáº¡i.");
+        lblSummary.setText("Chưa có kết quả phân loại.");
     }
 
     private String encode(String value) {

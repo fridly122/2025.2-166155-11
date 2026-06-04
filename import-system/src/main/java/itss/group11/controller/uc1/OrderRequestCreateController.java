@@ -90,8 +90,8 @@ public class OrderRequestCreateController {
         setupItemTable();
         setupMerchandiseComboBox();
 
-        requestTable.setPlaceholder(new Label("ChÆ°a cÃ³ yÃªu cáº§u nháº­p hÃ ng."));
-        itemTable.setPlaceholder(new Label("ChÆ°a cÃ³ máº·t hÃ ng nÃ o trong yÃªu cáº§u."));
+        requestTable.setPlaceholder(new Label("Chưa có yêu cầu nhập hàng."));
+        itemTable.setPlaceholder(new Label("Chưa có mặt hàng nào trong yêu cầu."));
         itemTable.setItems(requestItems);
 
         btnRemoveItem.disableProperty().bind(itemTable.getSelectionModel().selectedItemProperty().isNull());
@@ -112,12 +112,12 @@ public class OrderRequestCreateController {
         Integer quantity = spnQuantity.getValue();
 
         if (selectedMerchandise == null) {
-            showWarning("ChÆ°a chá»n máº·t hÃ ng", "Vui lÃ²ng chá»n má»™t máº·t hÃ ng trÆ°á»›c khi thÃªm vÃ o yÃªu cáº§u.");
+            showWarning("Chưa chọn mặt hàng", "Vui lòng chọn một mặt hàng trước khi thêm vào yêu cầu.");
             return;
         }
 
         if (quantity == null || quantity <= 0) {
-            showWarning("Sá»‘ lÆ°á»£ng khÃ´ng há»£p lá»‡", "Sá»‘ lÆ°á»£ng Ä‘áº·t pháº£i lá»›n hÆ¡n 0.");
+            showWarning("Số lượng không hợp lệ", "Số lượng đặt phải lớn hơn 0.");
             return;
         }
 
@@ -153,12 +153,12 @@ public class OrderRequestCreateController {
     @FXML
     private void handleCreateRequest() {
         if (dpDesiredDeliveryDate.getValue() == null) {
-            showWarning("Thiáº¿u ngÃ y nháº­n hÃ ng", "Vui lÃ²ng chá»n ngÃ y mong muá»‘n nháº­n hÃ ng.");
+            showWarning("Thiếu ngày nhận hàng", "Vui lòng chọn ngày mong muốn nhận hàng.");
             return;
         }
 
         if (requestItems.isEmpty()) {
-            showWarning("ChÆ°a cÃ³ máº·t hÃ ng", "YÃªu cáº§u nháº­p hÃ ng pháº£i cÃ³ Ã­t nháº¥t má»™t máº·t hÃ ng.");
+            showWarning("Chưa có mặt hàng", "Yêu cầu nhập hàng phải có ít nhất một mặt hàng.");
             return;
         }
 
@@ -185,23 +185,23 @@ public class OrderRequestCreateController {
                         objectMapper.readValue(response.body(), OrderRequestDetailDTO.class);
 
                 showInfo(
-                        "Táº¡o yÃªu cáº§u nháº­p hÃ ng thÃ nh cÃ´ng",
-                        "MÃ£ yÃªu cáº§u: " + createdRequest.getRequestCode()
-                                + "\nTráº¡ng thÃ¡i: " + createdRequest.getStatus()
-                                + "\nSá»‘ máº·t hÃ ng: " + createdRequest.getItems().size()
+                        "Tạo yêu cầu nhập hàng thành công",
+                        "Mã yêu cầu: " + createdRequest.getRequestCode()
+                                + "\nTrạng thái: " + createdRequest.getStatus()
+                                + "\nSố mặt hàng: " + createdRequest.getItems().size()
                 );
 
                 clearForm();
                 loadRequests();
             } else {
-                showError("Táº¡o yÃªu cáº§u nháº­p hÃ ng tháº¥t báº¡i", response.body());
+                showError("Tạo yêu cầu nhập hàng thất bại", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API táº¡o yÃªu cáº§u nháº­p hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API tạo yêu cầu nhập hàng: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API táº¡o yÃªu cáº§u nháº­p hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API tạo yêu cầu nhập hàng: " + e.getMessage());
         }
     }
 
@@ -254,14 +254,14 @@ public class OrderRequestCreateController {
 
                 cboMerchandise.setItems(FXCollections.observableArrayList(merchandise));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch máº·t hÃ ng", response.body());
+                showError("Không thể tải danh sách mặt hàng", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch máº·t hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách mặt hàng: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch máº·t hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách mặt hàng: " + e.getMessage());
         }
     }
 
@@ -291,14 +291,14 @@ public class OrderRequestCreateController {
                                 .toList()
                 ));
             } else {
-                showError("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch yÃªu cáº§u", response.body());
+                showError("Không thể tải danh sách yêu cầu", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch yÃªu cáº§u nháº­p hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách yêu cầu nhập hàng: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch yÃªu cáº§u nháº­p hÃ ng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách yêu cầu nhập hàng: " + e.getMessage());
         }
     }
 

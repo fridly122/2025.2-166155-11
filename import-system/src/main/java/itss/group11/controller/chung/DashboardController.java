@@ -87,13 +87,13 @@ public class DashboardController {
         if (!LoginSession.isAuthenticated()) {
             StageManager.switchScene(
                     "/itss/group11/view/chung/login.fxml",
-                    "ÄÄƒng nháº­p - Há»‡ thá»‘ng Äáº·t hÃ ng Nháº­p kháº©u"
+                    "Đăng nhập - Hệ thống Đặt hàng Nhập khẩu"
             );
             return;
         }
 
         UserRole role = LoginSession.getRole();
-        lblCurrentRole.setText("Vai trÃ²: " + role.getDisplayName());
+        lblCurrentRole.setText("Vai trò: " + role.getDisplayName());
         setupSidebarPermissions(role);
         setupSidebarHover();
         navigateToDefaultFeature(role);
@@ -160,7 +160,7 @@ public class DashboardController {
         LoginSession.clear();
         StageManager.switchScene(
                 "/itss/group11/view/chung/login.fxml",
-                "ÄÄƒng nháº­p - Há»‡ thá»‘ng Äáº·t hÃ ng Nháº­p kháº©u"
+                "Đăng nhập - Hệ thống Đặt hàng Nhập khẩu"
         );
     }
 
@@ -241,9 +241,9 @@ public class DashboardController {
 
     private void showAccessDenied() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("KhÃ´ng cÃ³ quyá»n truy cáº­p");
-        alert.setHeaderText("KhÃ´ng cÃ³ quyá»n truy cáº­p");
-        alert.setContentText("Vai trÃ² hiá»‡n táº¡i khÃ´ng Ä‘Æ°á»£c phÃ©p sá»­ dá»¥ng chá»©c nÄƒng nÃ y.");
+        alert.setTitle("Không có quyền truy cập");
+        alert.setHeaderText("Không có quyền truy cập");
+        alert.setContentText("Vai trò hiện tại không được phép sử dụng chức năng này.");
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.showAndWait();
     }

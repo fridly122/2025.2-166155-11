@@ -25,7 +25,7 @@ public class OrderRequestController {
             return ResponseEntity.ok(orderRequestService.getAllRequests());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch yÃªu cáº§u nháº­p hÃ ng: " + e.getMessage());
+                    .body("Không thể tải danh sách yêu cầu nhập hàng: " + e.getMessage());
         }
     }
 
@@ -35,7 +35,7 @@ public class OrderRequestController {
             return ResponseEntity.ok(orderRequestService.getRequestDetail(requestCode));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body("KhÃ´ng thá»ƒ táº£i chi tiáº¿t yÃªu cáº§u nháº­p hÃ ng: " + e.getMessage());
+                    .body("Không thể tải chi tiết yêu cầu nhập hàng: " + e.getMessage());
         }
     }
 
@@ -45,7 +45,7 @@ public class OrderRequestController {
             return ResponseEntity.ok(orderRequestService.getMerchandiseOptions());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch máº·t hÃ ng: " + e.getMessage());
+                    .body("Không thể tải danh sách mặt hàng: " + e.getMessage());
         }
     }
 
@@ -55,7 +55,7 @@ public class OrderRequestController {
             return ResponseEntity.ok(orderRequestService.createRequest(dto));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body("Táº¡o yÃªu cáº§u nháº­p hÃ ng tháº¥t báº¡i: " + e.getMessage());
+                    .body("Tạo yêu cầu nhập hàng thất bại: " + e.getMessage());
         }
     }
 }

@@ -25,7 +25,7 @@ public class SiteSyncController {
             return ResponseEntity.ok(siteSyncService.getPendingRequests());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch yÃªu cáº§u nháº­p hÃ ng: " + e.getMessage());
+                    .body("Không thể tải danh sách yêu cầu nhập hàng: " + e.getMessage());
         }
     }
 
@@ -35,7 +35,7 @@ public class SiteSyncController {
             return ResponseEntity.ok(siteSyncService.getRequestDetail(requestCode));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body("KhÃ´ng thá»ƒ táº£i chi tiáº¿t yÃªu cáº§u nháº­p hÃ ng: " + e.getMessage());
+                    .body("Không thể tải chi tiết yêu cầu nhập hàng: " + e.getMessage());
         }
     }
 
@@ -45,7 +45,7 @@ public class SiteSyncController {
             return ResponseEntity.ok(siteSyncService.classifyOrderRequest(requestCode));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body("PhÃ¢n loáº¡i yÃªu cáº§u nháº­p hÃ ng tháº¥t báº¡i: " + e.getMessage());
+                    .body("Phân loại yêu cầu nhập hàng thất bại: " + e.getMessage());
         }
     }
 
@@ -55,7 +55,7 @@ public class SiteSyncController {
             return ResponseEntity.ok(siteSyncService.sendInventoryInquiry(requestCode));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body("Gá»­i yÃªu cáº§u há»i tá»“n kho tháº¥t báº¡i: " + e.getMessage());
+                    .body("Gửi yêu cầu hỏi tồn kho thất bại: " + e.getMessage());
         }
     }
 
@@ -65,7 +65,7 @@ public class SiteSyncController {
             return ResponseEntity.ok(siteSyncService.getMerchandiseOptions());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch máº·t hÃ ng: " + e.getMessage());
+                    .body("Không thể tải danh sách mặt hàng: " + e.getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ public class SiteSyncController {
             return ResponseEntity.ok(siteSyncService.classifySites(requestDTO));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body("TÃ¬m site vÃ  phÃ¢n loáº¡i tháº¥t báº¡i: " + e.getMessage());
+                    .body("Tìm site và phân loại thất bại: " + e.getMessage());
         }
     }
 }

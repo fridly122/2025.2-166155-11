@@ -14,21 +14,21 @@ public class ImportSite {
 
     @Id
     @Column(name = "site_code", length = 50)
-    private String siteCode;           // MÃ£ site (VD: "SITE_JP_01")
+    private String siteCode;           // Mã site (VD: "SITE_JP_01")
 
     @Column(name = "site_name", nullable = false, length = 100)
-    private String siteName;           // TÃªn site (VD: "Kho Tokyo")
+    private String siteName;           // Tên site (VD: "Kho Tokyo")
 
     @Column(name = "days_by_ship")
-    private Integer daysByShip;        // Sá»‘ ngÃ y váº­n chuyá»ƒn báº±ng tÃ u
+    private Integer daysByShip;        // Số ngày vận chuyển bằng tàu
 
     @Column(name = "days_by_air")
-    private Integer daysByAir;         // Sá»‘ ngÃ y váº­n chuyá»ƒn báº±ng hÃ ng khÃ´ng
+    private Integer daysByAir;         // Số ngày vận chuyển bằng hàng không
 
     @Column(name = "other_info", length = 500)
-    private String otherInfo;          // ThÃ´ng tin khÃ¡c
+    private String otherInfo;          // Thông tin khác
 
-    // Danh sÃ¡ch máº·t hÃ ng site nÃ y kinh doanh
+    // Danh sách mặt hàng site này kinh doanh
     @ManyToMany
     @JoinTable(
         name = "site_merchandise",

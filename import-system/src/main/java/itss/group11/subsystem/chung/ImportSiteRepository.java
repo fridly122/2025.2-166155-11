@@ -18,13 +18,13 @@ public interface ImportSiteRepository extends JpaRepository<ImportSite, String> 
     List<ImportSite> findAllByOrderBySiteCodeAsc();
 
     /**
-     * Truy váº¥n PostgreSQL tÃ­nh tá»•ng sá»‘ lÆ°á»£ng tá»“n kho cá»§a má»™t máº·t hÃ ng trÃªn toÃ n bá»™ há»‡ thá»‘ng cÃ¡c Site
+     * Truy vấn PostgreSQL tính tổng số lượng tồn kho của một mặt hàng trên toàn bộ hệ thống các Site
      */
     @Query(value = "SELECT COALESCE(SUM(in_stock_quantity), 0) FROM site_inventory WHERE merchandise_code = :merchandiseCode", nativeQuery = true)
     int calculateTotalStockByItem(@Param("merchandiseCode") String merchandiseCode);
 
     /**
-     * Truy váº¥n láº¥y danh sÃ¡ch chi tiáº¿t tá»“n kho cá»§a máº·t hÃ ng táº¡i tá»«ng Site cá»¥ thá»ƒ, map trá»±c tiáº¿p vÃ o DTO
+     * Truy vấn lấy danh sách chi tiết tồn kho của mặt hàng tại từng Site cụ thể, map trực tiếp vào DTO
      */
     @Query(value = "SELECT new itss.group11.entity.uc5.SiteStockDTO(s.siteCode, s.siteName, si.merchandise.code, si.inStockQuantity, s.daysByShip, s.daysByAir) " +
                    "FROM SiteInventory si JOIN si.importSite s " +

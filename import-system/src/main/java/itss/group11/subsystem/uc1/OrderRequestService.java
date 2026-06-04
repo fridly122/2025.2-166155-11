@@ -42,7 +42,7 @@ public class OrderRequestService {
     @Transactional(readOnly = true)
     public OrderRequestDetailDTO getRequestDetail(String requestCode) {
         OrderRequest request = orderRequestRepository.findByRequestCode(requestCode)
-                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y yÃªu cáº§u nháº­p hÃ ng: " + requestCode));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu nhập hàng: " + requestCode));
 
         return toDetailDTO(request);
     }
@@ -65,7 +65,7 @@ public class OrderRequestService {
 
         String requestCode = normalizeOrGenerateRequestCode(dto.getRequestCode());
         if (orderRequestRepository.existsById(requestCode)) {
-            throw new RuntimeException("MÃ£ yÃªu cáº§u Ä‘Ã£ tá»“n táº¡i: " + requestCode);
+            throw new RuntimeException("Mã yêu cầu đã tồn tại: " + requestCode);
         }
 
         LocalDate desiredDeliveryDate = parseDesiredDeliveryDate(dto.getDesiredDeliveryDate());
@@ -78,15 +78,15 @@ public class OrderRequestService {
                 .build();
 
         for (OrderRequestCreationDTO.ItemDTO itemDTO : dto.getItems()) {
-            String merchandiseCode = requireText(itemDTO.getMerchandiseCode(), "MÃ£ máº·t hÃ ng khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng")
+            String merchandiseCode = requireText(itemDTO.getMerchandiseCode(), "Mã mặt hàng không được để trống")
                     .toUpperCase();
 
             Merchandise merchandise = merchandiseRepository.findByCode(merchandiseCode)
-                    .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y máº·t hÃ ng: " + merchandiseCode));
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy mặt hàng: " + merchandiseCode));
 
             Integer quantity = itemDTO.getQuantityOrdered();
             if (quantity == null || quantity <= 0) {
-                throw new RuntimeException("Sá»‘ lÆ°á»£ng Ä‘áº·t pháº£i lá»›n hÆ¡n 0 cho máº·t hÃ ng: " + merchandiseCode);
+                throw new RuntimeException("Số lượng đặt phải lớn hơn 0 cho mặt hàng: " + merchandiseCode);
             }
 
             OrderRequestItem item = OrderRequestItem.builder()
@@ -104,11 +104,11 @@ public class OrderRequestService {
 
     private void validateCreationDTO(OrderRequestCreationDTO dto) {
         if (dto == null) {
-            throw new RuntimeException("Dá»¯ liá»‡u táº¡o yÃªu cáº§u khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            throw new RuntimeException("Dữ liệu tạo yêu cầu không được để trống.");
         }
 
         if (dto.getItems() == null || dto.getItems().isEmpty()) {
-            throw new RuntimeException("YÃªu cáº§u nháº­p hÃ ng pháº£i cÃ³ Ã­t nháº¥t má»™t máº·t hÃ ng.");
+            throw new RuntimeException("Yêu cầu nhập hàng phải có ít nhất một mặt hàng.");
         }
     }
 
@@ -158,16 +158,16 @@ public class OrderRequestService {
     }
 
     private LocalDate parseDesiredDeliveryDate(String value) {
-        String normalizedValue = requireText(value, "NgÃ y mong muá»‘n nháº­n hÃ ng khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng");
+        String normalizedValue = requireText(value, "Ngày mong muốn nhận hàng không được để trống");
         try {
             LocalDate desiredDeliveryDate = LocalDate.parse(normalizedValue);
             if (!desiredDeliveryDate.isAfter(LocalDate.now())) {
-                throw new RuntimeException("NgÃ y mong muá»‘n nháº­n hÃ ng pháº£i sau ngÃ y hiá»‡n táº¡i.");
+                throw new RuntimeException("Ngày mong muốn nhận hàng phải sau ngày hiện tại.");
             }
 
             return desiredDeliveryDate;
         } catch (DateTimeParseException e) {
-            throw new RuntimeException("NgÃ y mong muá»‘n nháº­n hÃ ng pháº£i cÃ³ Ä‘á»‹nh dáº¡ng yyyy-MM-dd.");
+            throw new RuntimeException("Ngày mong muốn nhận hàng phải có định dạng yyyy-MM-dd.");
         }
     }
 

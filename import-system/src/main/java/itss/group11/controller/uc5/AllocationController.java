@@ -25,7 +25,7 @@ public class AllocationController {
             return ResponseEntity.ok(allocationService.getPendingRequests());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch yÃªu cáº§u chá» phÃ¢n bá»•: " + e.getMessage());
+                    .body("Không thể tải danh sách yêu cầu chờ phân bổ: " + e.getMessage());
         }
     }
 
@@ -36,7 +36,7 @@ public class AllocationController {
             return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body("KhÃ´ng thá»ƒ xem trÆ°á»›c káº¿ hoáº¡ch: " + e.getMessage());
+                    .body("Không thể xem trước kế hoạch: " + e.getMessage());
         }
     }
 
@@ -48,11 +48,11 @@ public class AllocationController {
         } catch (RuntimeException e) {
             if ("INSUFFICIENT_INVENTORY".equals(e.getMessage())) {
                 return ResponseEntity.badRequest()
-                        .body("Lá»—i: Tá»•ng tá»“n kho tá»« cÃ¡c Site khÃ´ng Ä‘á»§ Ä‘á»ƒ Ä‘Ã¡p á»©ng yÃªu cáº§u nháº­p hÃ ng.");
+                        .body("Lỗi: Tổng tồn kho từ các Site không đủ để đáp ứng yêu cầu nhập hàng.");
             }
 
             return ResponseEntity.badRequest()
-                    .body("Xá»­ lÃ½ tháº¥t báº¡i: " + e.getMessage());
+                    .body("Xử lý thất bại: " + e.getMessage());
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -25,13 +25,13 @@
                 <VBox maxWidth="420.0" spacing="14.0"
                       style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 28; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.12), 8, 0, 0, 3);">
                     <children>
-                        <Label text="Há»† THá»NG Äáº¶T HÃ€NG NHáº¬P KHáº¨U" textFill="#1a252f">
+                        <Label text="HỆ THỐNG ĐẶT HÀNG NHẬP KHẨU" textFill="#1a252f">
                             <font>
                                 <Font name="System Bold" size="20.0"/>
                             </font>
                         </Label>
 
-                        <Label text="ÄÄƒng nháº­p theo vai trÃ²" textFill="#34495e">
+                        <Label text="Đăng nhập theo vai trò" textFill="#34495e">
                             <font>
                                 <Font name="System Bold" size="15.0"/>
                             </font>
@@ -39,20 +39,20 @@
 
                         <VBox spacing="8.0">
                             <children>
-                                <Label text="TÃªn Ä‘Äƒng nháº­p" textFill="#2c3e50"/>
+                                <Label text="Tên đăng nhập" textFill="#2c3e50"/>
                                 <TextField fx:id="txtUsername"
                                            prefHeight="36.0"
-                                           promptText="Nháº­p tÃªn Ä‘Äƒng nháº­p"/>
+                                           promptText="Nhập tên đăng nhập"/>
                             </children>
                         </VBox>
 
                         <VBox spacing="8.0">
                             <children>
-                                <Label text="Máº­t kháº©u" textFill="#2c3e50"/>
+                                <Label text="Mật khẩu" textFill="#2c3e50"/>
                                 <PasswordField fx:id="txtPassword"
                                                onAction="#handleLogin"
                                                prefHeight="36.0"
-                                               promptText="Nháº­p máº­t kháº©u"/>
+                                               promptText="Nhập mật khẩu"/>
                             </children>
                         </VBox>
 
@@ -67,7 +67,7 @@
                                         onAction="#handleLogin"
                                         prefHeight="38.0"
                                         prefWidth="120.0"
-                                        text="ÄÄƒng nháº­p"
+                                        text="Đăng nhập"
                                         style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
                             </children>
                         </HBox>

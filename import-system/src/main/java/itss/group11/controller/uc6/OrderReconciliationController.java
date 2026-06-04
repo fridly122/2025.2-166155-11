@@ -89,8 +89,8 @@ public class OrderReconciliationController {
         setupPurchaseOrderTable();
         setupLineTable();
 
-        poTable.setPlaceholder(new Label("KhÃ´ng cÃ³ Ä‘Æ¡n hÃ ng IN_TRANSIT chá» Ä‘á»‘i soÃ¡t."));
-        lineTable.setPlaceholder(new Label("Chá»n má»™t Ä‘Æ¡n hÃ ng Ä‘á»ƒ xem chi tiáº¿t."));
+        poTable.setPlaceholder(new Label("Không có đơn hàng IN_TRANSIT chờ đối soát."));
+        lineTable.setPlaceholder(new Label("Chọn một đơn hàng để xem chi tiết."));
 
         btnConfirm.disableProperty().bind(lineTable.itemsProperty().isNull());
 
@@ -111,12 +111,12 @@ public class OrderReconciliationController {
     private void handleConfirmReconciliation() {
         PurchaseOrderRow selected = poTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showWarning("ChÆ°a chá»n Ä‘Æ¡n hÃ ng", "Vui lÃ²ng chá»n má»™t Ä‘Æ¡n hÃ ng trÆ°á»›c khi xÃ¡c nháº­n nháº­p kho.");
+            showWarning("Chưa chọn đơn hàng", "Vui lòng chọn một đơn hàng trước khi xác nhận nhập kho.");
             return;
         }
 
         if (lineTable.getItems() == null || lineTable.getItems().isEmpty()) {
-            showWarning("ChÆ°a cÃ³ dÃ²ng hÃ ng", "ÄÆ¡n hÃ ng chÆ°a cÃ³ dÃ²ng hÃ ng Ä‘á»ƒ Ä‘á»‘i soÃ¡t.");
+            showWarning("Chưa có dòng hàng", "Đơn hàng chưa có dòng hàng để đối soát.");
             return;
         }
 
@@ -133,14 +133,14 @@ public class OrderReconciliationController {
 
             ReconciliationResultDTO result = apiClient.reconcile(selected.getOrderId(), dto);
 
-            showInfo("XÃ¡c nháº­n nháº­p kho thÃ nh cÃ´ng", buildSuccessMessage(result));
+            showInfo("Xác nhận nhập kho thành công", buildSuccessMessage(result));
             clearDetail();
             loadInTransitOrders();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API xÃ¡c nháº­n nháº­p kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API xác nhận nhập kho: " + e.getMessage());
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API xÃ¡c nháº­n nháº­p kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API xác nhận nhập kho: " + e.getMessage());
         }
     }
 
@@ -166,7 +166,7 @@ public class OrderReconciliationController {
         colReceivedQty.setOnEditCommit(event -> {
             Integer value = event.getNewValue();
             if (value == null || value < 0) {
-                showWarning("Dá»¯ liá»‡u khÃ´ng há»£p lá»‡", "Sá»‘ lÆ°á»£ng thá»±c nháº­n pháº£i lá»›n hÆ¡n hoáº·c báº±ng 0.");
+                showWarning("Dữ liệu không hợp lệ", "Số lượng thực nhận phải lớn hơn hoặc bằng 0.");
                 lineTable.refresh();
                 return;
             }
@@ -194,9 +194,9 @@ public class OrderReconciliationController {
             ));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch PO: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách PO: " + e.getMessage());
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API danh sÃ¡ch PO: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách PO: " + e.getMessage());
         }
     }
 
@@ -206,7 +206,7 @@ public class OrderReconciliationController {
             return;
         }
 
-        lblSelectedPo.setText("Äang chá»n: " + selected.getOrderId() + " | " + selected.getSite());
+        lblSelectedPo.setText("Đang chọn: " + selected.getOrderId() + " | " + selected.getSite());
         loadReconciliationDetail(selected.getOrderId());
     }
 
@@ -222,9 +222,9 @@ public class OrderReconciliationController {
             ));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API chi tiáº¿t Ä‘á»‘i soÃ¡t: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API chi tiết đối soát: " + e.getMessage());
         } catch (IOException e) {
-            showError("Lá»—i káº¿t ná»‘i", "KhÃ´ng gá»i Ä‘Æ°á»£c API chi tiáº¿t Ä‘á»‘i soÃ¡t: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API chi tiết đối soát: " + e.getMessage());
         }
     }
 
@@ -240,7 +240,7 @@ public class OrderReconciliationController {
     }
 
     private void clearDetail() {
-        lblSelectedPo.setText("ChÆ°a chá»n Ä‘Æ¡n hÃ ng");
+        lblSelectedPo.setText("Chưa chọn đơn hàng");
         lineTable.setItems(FXCollections.observableArrayList());
         txtReason.clear();
         txtNote.clear();
@@ -249,13 +249,13 @@ public class OrderReconciliationController {
     private String buildSuccessMessage(ReconciliationResultDTO result) {
         StringBuilder builder = new StringBuilder();
         builder.append(result.getMessage()).append("\n");
-        builder.append("MÃ£ PO: ").append(result.getOrderId()).append("\n");
-        builder.append("Tráº¡ng thÃ¡i má»›i: ").append(result.getStatus()).append("\n");
+        builder.append("Mã PO: ").append(result.getOrderId()).append("\n");
+        builder.append("Trạng thái mới: ").append(result.getStatus()).append("\n");
 
         if (result.isHasDiscrepancy()
                 && result.getDiscrepancyReportIds() != null
                 && !result.getDiscrepancyReportIds().isEmpty()) {
-            builder.append("BiÃªn báº£n sai lá»‡ch:\n");
+            builder.append("Biên bản sai lệch:\n");
             for (String reportId : result.getDiscrepancyReportIds()) {
                 builder.append("- ").append(reportId).append("\n");
             }

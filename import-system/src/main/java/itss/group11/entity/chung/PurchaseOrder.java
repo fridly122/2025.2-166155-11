@@ -16,15 +16,15 @@ public class PurchaseOrder {
 
     @Id
     @Column(name = "order_id", length = 50)
-    private String orderId;             // MÃ£ Ä‘Æ¡n (VD: "DH001")
+    private String orderId;             // Mã đơn (VD: "DH001")
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_code")
-    private OrderRequest orderRequest;  // YÃªu cáº§u gá»‘c tá»« BP bÃ¡n hÃ ng
+    private OrderRequest orderRequest;  // Yêu cầu gốc từ BP bán hàng
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "site_code")
-    private ImportSite site;            // Site Ä‘Æ°á»£c chá»n
+    private ImportSite site;            // Site được chọn
 
     @Column(name = "status", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
@@ -37,10 +37,10 @@ public class PurchaseOrder {
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseOrderLine> orderLines;
     public enum PurchaseOrderStatus {
-        CREATED,            // Vá»«a táº¡o
-        CONFIRMED,          // Site Ä‘Ã£ xÃ¡c nháº­n
-        IN_TRANSIT,         // Äang váº­n chuyá»ƒn
-        RECEIVED,           // ÄÃ£ nháº­p kho
-        CANCELLED           // ÄÃ£ há»§y
+        CREATED,            // Vừa tạo
+        CONFIRMED,          // Site đã xác nhận
+        IN_TRANSIT,         // Đang vận chuyển
+        RECEIVED,           // Đã nhập kho
+        CANCELLED           // Đã hủy
     }
 }
