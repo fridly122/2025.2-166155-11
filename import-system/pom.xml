@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -125,7 +125,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>itss.group11/itss.group11.frontend.App</mainClass>
+                    <mainClass>itss.group11/itss.group11.controller.chung.App</mainClass>
 
                     <options>
                         <option>--add-opens</option>
@@ -144,6 +144,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
+                    <argLine>-Dnet.bytebuddy.experimental=true</argLine>
                     <useModulePath>false</useModulePath>
                 </configuration>
             </plugin>
@@ -152,3 +153,4 @@
     </build>
 
 </project>
+
