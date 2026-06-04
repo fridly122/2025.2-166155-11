@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #ecf0f1;"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="itss.group11.controller.chung.LoginController">
+
+    <children>
+        <VBox alignment="CENTER" spacing="18.0"
+              AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="0.0">
+            <children>
+                <VBox maxWidth="420.0" spacing="14.0"
+                      style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 28; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.12), 8, 0, 0, 3);">
+                    <children>
+                        <Label text="Há»† THá»NG Äáº¶T HÃ€NG NHáº¬P KHáº¨U" textFill="#1a252f">
+                            <font>
+                                <Font name="System Bold" size="20.0"/>
+                            </font>
+                        </Label>
+
+                        <Label text="ÄÄƒng nháº­p theo vai trÃ²" textFill="#34495e">
+                            <font>
+                                <Font name="System Bold" size="15.0"/>
+                            </font>
+                        </Label>
+
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label text="TÃªn Ä‘Äƒng nháº­p" textFill="#2c3e50"/>
+                                <TextField fx:id="txtUsername"
+                                           prefHeight="36.0"
+                                           promptText="Nháº­p tÃªn Ä‘Äƒng nháº­p"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label text="Máº­t kháº©u" textFill="#2c3e50"/>
+                                <PasswordField fx:id="txtPassword"
+                                               onAction="#handleLogin"
+                                               prefHeight="36.0"
+                                               promptText="Nháº­p máº­t kháº©u"/>
+                            </children>
+                        </VBox>
+
+                        <Label fx:id="lblMessage"
+                               maxWidth="Infinity"
+                               textFill="#c0392b"
+                               wrapText="true"/>
+
+                        <HBox alignment="CENTER_RIGHT">
+                            <children>
+                                <Button mnemonicParsing="false"
+                                        onAction="#handleLogin"
+                                        prefHeight="38.0"
+                                        prefWidth="120.0"
+                                        text="ÄÄƒng nháº­p"
+                                        style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
+

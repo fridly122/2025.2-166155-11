@@ -1,0 +1,166 @@
+package itss.group11.subsystem.uc3;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import itss.group11.entity.uc1.MerchandiseOptionDTO;
+import itss.group11.entity.uc3.InternalInventoryRowDTO;
+import itss.group11.entity.uc3.InventoryRowDTO;
+import itss.group11.entity.uc3.InventoryUpdateDTO;
+import itss.group11.entity.uc3.SiteOptionDTO;
+import itss.group11.entity.chung.ImportSite;
+import itss.group11.entity.chung.InternalWarehouseInventory;
+import itss.group11.entity.chung.Merchandise;
+import itss.group11.entity.chung.SiteInventory;
+import itss.group11.subsystem.chung.ImportSiteRepository;
+import itss.group11.subsystem.chung.MerchandiseRepository;
+import itss.group11.subsystem.chung.SiteInventoryRepository;
+import itss.group11.subsystem.chung.InternalWarehouseInventoryRepository;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class InventoryManagementService {
+
+    private static final String IN_STOCK = "CÃ’N HÃ€NG";
+    private static final String OUT_OF_STOCK = "Háº¾T HÃ€NG";
+
+    private final SiteInventoryRepository siteInventoryRepository;
+    private final ImportSiteRepository importSiteRepository;
+    private final MerchandiseRepository merchandiseRepository;
+    private final InternalWarehouseInventoryRepository internalWarehouseInventoryRepository;
+
+    @Transactional(readOnly = true)
+    public List<InventoryRowDTO> getInventoryRows() {
+        return siteInventoryRepository.findAllWithSiteAndMerchandise()
+                .stream()
+                .map(this::toInventoryRowDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<InternalInventoryRowDTO> getInternalInventoryRows() {
+        return internalWarehouseInventoryRepository.findAllWithMerchandiseOrderByCodeAsc()
+                .stream()
+                .map(this::toInternalInventoryRowDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SiteOptionDTO> getSiteOptions() {
+        return importSiteRepository.findAllByOrderBySiteCodeAsc()
+                .stream()
+                .map(site -> SiteOptionDTO.builder()
+                        .siteCode(site.getSiteCode())
+                        .siteName(site.getSiteName())
+                        .build())
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MerchandiseOptionDTO> getMerchandiseOptions() {
+        return merchandiseRepository.findAllByOrderByCodeAsc()
+                .stream()
+                .map(merchandise -> MerchandiseOptionDTO.builder()
+                        .code(merchandise.getCode())
+                        .name(merchandise.getName())
+                        .unit(merchandise.getUnit())
+                        .build())
+                .toList();
+    }
+
+    @Transactional
+    public InventoryRowDTO updateInventory(InventoryUpdateDTO dto) {
+        validateUpdateDTO(dto);
+
+        String siteCode = dto.getSiteCode().trim().toUpperCase();
+        String merchandiseCode = dto.getMerchandiseCode().trim().toUpperCase();
+
+        ImportSite site = importSiteRepository.findBySiteCode(siteCode)
+                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y site: " + siteCode));
+
+        Merchandise merchandise = merchandiseRepository.findByCode(merchandiseCode)
+                .orElseThrow(() -> new RuntimeException("KhÃ´ng tÃ¬m tháº¥y máº·t hÃ ng: " + merchandiseCode));
+
+        SiteInventory inventory = siteInventoryRepository
+                .findBySiteCodeAndMerchandiseCode(siteCode, merchandiseCode)
+                .orElseGet(() -> SiteInventory.builder()
+                        .importSite(site)
+                        .merchandise(merchandise)
+                        .build());
+
+        inventory.setInStockQuantity(dto.getInStockQuantity());
+        ensureSiteSellsMerchandise(site, merchandise);
+
+        return toInventoryRowDTO(siteInventoryRepository.save(inventory));
+    }
+
+    private void validateUpdateDTO(InventoryUpdateDTO dto) {
+        if (dto == null) {
+            throw new RuntimeException("Dá»¯ liá»‡u tá»“n kho khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+        }
+
+        if (dto.getSiteCode() == null || dto.getSiteCode().isBlank()) {
+            throw new RuntimeException("MÃ£ site khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+        }
+
+        if (dto.getMerchandiseCode() == null || dto.getMerchandiseCode().isBlank()) {
+            throw new RuntimeException("MÃ£ máº·t hÃ ng khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+        }
+
+        if (dto.getInStockQuantity() == null || dto.getInStockQuantity() < 0) {
+            throw new RuntimeException("Sá»‘ lÆ°á»£ng tá»“n kho pháº£i lá»›n hÆ¡n hoáº·c báº±ng 0.");
+        }
+    }
+
+    private void ensureSiteSellsMerchandise(ImportSite site, Merchandise merchandise) {
+        if (site.getMerchandiseList() == null) {
+            site.setMerchandiseList(new ArrayList<>());
+        }
+
+        boolean alreadyExists = site.getMerchandiseList()
+                .stream()
+                .anyMatch(existing -> merchandise.getCode().equals(existing.getCode()));
+
+        if (!alreadyExists) {
+            site.getMerchandiseList().add(merchandise);
+            importSiteRepository.save(site);
+        }
+    }
+
+    private InventoryRowDTO toInventoryRowDTO(SiteInventory inventory) {
+        ImportSite site = inventory.getImportSite();
+        Merchandise merchandise = inventory.getMerchandise();
+        Integer quantity = inventory.getInStockQuantity() == null ? 0 : inventory.getInStockQuantity();
+
+        return InventoryRowDTO.builder()
+                .id(inventory.getId())
+                .siteCode(site == null ? "" : site.getSiteCode())
+                .siteName(site == null ? "" : site.getSiteName())
+                .merchandiseCode(merchandise == null ? "" : merchandise.getCode())
+                .merchandiseName(merchandise == null ? "" : merchandise.getName())
+                .unit(merchandise == null ? "" : merchandise.getUnit())
+                .inStockQuantity(quantity)
+                .stockStatus(quantity > 0 ? IN_STOCK : OUT_OF_STOCK)
+                .build();
+    }
+
+    private InternalInventoryRowDTO toInternalInventoryRowDTO(InternalWarehouseInventory inventory) {
+        Merchandise merchandise = inventory.getMerchandise();
+        Integer quantity = inventory.getInStockQuantity() == null ? 0 : inventory.getInStockQuantity();
+
+        return InternalInventoryRowDTO.builder()
+                .id(inventory.getId())
+                .merchandiseCode(merchandise == null ? "" : merchandise.getCode())
+                .merchandiseName(merchandise == null ? "" : merchandise.getName())
+                .unit(merchandise == null ? "" : merchandise.getUnit())
+                .inStockQuantity(quantity)
+                .stockStatus(quantity > 0 ? IN_STOCK : OUT_OF_STOCK)
+                .updatedAt(inventory.getUpdatedAt() == null ? "" : inventory.getUpdatedAt().toString())
+                .build();
+    }
+}
+

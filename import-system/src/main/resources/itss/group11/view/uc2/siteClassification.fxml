@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="640.0" prefWidth="900.0" style="-fx-background-color: #ecf0f1;"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="itss.group11.controller.uc2.SiteClassificationController">
+
+    <children>
+        <VBox spacing="15.0"
+              style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);"
+              AnchorPane.bottomAnchor="20.0"
+              AnchorPane.leftAnchor="20.0"
+              AnchorPane.rightAnchor="20.0"
+              AnchorPane.topAnchor="20.0">
+
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <Label text="TÃŒM SITE VÃ€ PHÃ‚N LOáº I Máº¶T HÃ€NG" textFill="#2c3e50">
+                            <font>
+                                <Font name="System Bold" size="20.0"/>
+                            </font>
+                        </Label>
+                        <Button mnemonicParsing="false"
+                                onAction="#handleRefresh"
+                                text="LÃ m má»›i"
+                                style="-fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                    </children>
+                </HBox>
+
+                <SplitPane dividerPositions="0.42" prefHeight="220.0" VBox.vgrow="NEVER">
+                    <items>
+                        <VBox spacing="8.0" style="-fx-padding: 0 8 0 0;">
+                            <children>
+                                <Label text="YÃªu cáº§u nháº­p hÃ ng chá» phÃ¢n loáº¡i" textFill="#34495e">
+                                    <font>
+                                        <Font name="System Bold" size="13.0"/>
+                                    </font>
+                                </Label>
+                                <TableView fx:id="requestTable" VBox.vgrow="ALWAYS" style="-fx-font-size: 13px;">
+                                    <columns>
+                                        <TableColumn fx:id="colRequestCode" prefWidth="110.0" text="MÃ£ yÃªu cáº§u"/>
+                                        <TableColumn fx:id="colRequestStatus" prefWidth="90.0" text="Tráº¡ng thÃ¡i"/>
+                                        <TableColumn fx:id="colDesiredDate" prefWidth="120.0" text="NgÃ y muá»‘n nháº­n"/>
+                                        <TableColumn fx:id="colItemCount" prefWidth="70.0" text="Sá»‘ dÃ²ng"/>
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    </columnResizePolicy>
+                                </TableView>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="8.0" style="-fx-padding: 0 0 0 8;">
+                            <children>
+                                <Label text="Chi tiáº¿t máº·t hÃ ng trong yÃªu cáº§u" textFill="#34495e">
+                                    <font>
+                                        <Font name="System Bold" size="13.0"/>
+                                    </font>
+                                </Label>
+                                <TableView fx:id="itemTable" VBox.vgrow="ALWAYS" style="-fx-font-size: 13px;">
+                                    <columns>
+                                        <TableColumn fx:id="colItemCode" prefWidth="95.0" text="MÃ£ hÃ ng"/>
+                                        <TableColumn fx:id="colItemName" prefWidth="180.0" text="TÃªn hÃ ng"/>
+                                        <TableColumn fx:id="colRequiredQty" prefWidth="80.0" text="Sá»‘ lÆ°á»£ng"/>
+                                        <TableColumn fx:id="colUnit" prefWidth="70.0" text="ÄÆ¡n vá»‹"/>
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    </columnResizePolicy>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </items>
+                </SplitPane>
+
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <children>
+                        <Button fx:id="btnClassify"
+                                mnemonicParsing="false"
+                                onAction="#handleClassify"
+                                prefHeight="38.0"
+                                text="Báº¯t Ä‘áº§u phÃ¢n loáº¡i"
+                                style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                        <Button fx:id="btnSendInquiry"
+                                mnemonicParsing="false"
+                                onAction="#handleSendInquiry"
+                                prefHeight="38.0"
+                                text="Gá»­i yÃªu cáº§u há»i tá»“n kho"
+                                style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                    </children>
+                </HBox>
+
+                <Label fx:id="lblSummary"
+                       maxWidth="Infinity"
+                       text="ChÆ°a cÃ³ káº¿t quáº£ phÃ¢n loáº¡i."
+                       textFill="#34495e"
+                       wrapText="true"
+                       style="-fx-background-color: #eef5fb; -fx-background-radius: 6; -fx-padding: 10;">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                </Label>
+
+                <TableView fx:id="resultTable" VBox.vgrow="ALWAYS" style="-fx-font-size: 14px;">
+                    <columns>
+                        <TableColumn fx:id="colSiteCode" prefWidth="90.0" text="MÃ£ site"/>
+                        <TableColumn fx:id="colSiteName" prefWidth="160.0" text="TÃªn site"/>
+                        <TableColumn fx:id="colResultItemCode" prefWidth="90.0" text="MÃ£ hÃ ng"/>
+                        <TableColumn fx:id="colResultItemName" prefWidth="170.0" text="TÃªn hÃ ng"/>
+                        <TableColumn fx:id="colResultRequiredQty" prefWidth="80.0" text="Cáº§n"/>
+                        <TableColumn fx:id="colInStock" prefWidth="80.0" text="Tá»“n kho"/>
+                        <TableColumn fx:id="colClassification" prefWidth="140.0" text="PhÃ¢n loáº¡i"/>
+                        <TableColumn fx:id="colTransport" prefWidth="80.0" text="VC"/>
+                        <TableColumn fx:id="colEstimatedDays" prefWidth="80.0" text="Sá»‘ ngÃ y"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
+
