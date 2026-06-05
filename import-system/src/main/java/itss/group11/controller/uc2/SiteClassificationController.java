@@ -11,12 +11,12 @@ import java.util.Arrays;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import itss.group11.controller.chung.ApiConfig;
 import itss.group11.entity.uc1.OrderRequestDetailDTO;
 import itss.group11.entity.uc1.OrderRequestSummaryDTO;
 import itss.group11.entity.uc2.InventoryInquirySendResultDTO;
 import itss.group11.entity.uc2.OrderRequestClassificationDTO;
 import itss.group11.entity.uc2.SiteClassificationResultDTO;
-import itss.group11.controller.chung.ApiConfig;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -89,16 +89,7 @@ public class SiteClassificationController {
     private TableColumn<SiteResultRow, Integer> colResultRequiredQty;
 
     @FXML
-    private TableColumn<SiteResultRow, Integer> colInStock;
-
-    @FXML
-    private TableColumn<SiteResultRow, String> colClassification;
-
-    @FXML
-    private TableColumn<SiteResultRow, String> colTransport;
-
-    @FXML
-    private TableColumn<SiteResultRow, Integer> colEstimatedDays;
+    private TableColumn<SiteResultRow, String> colResultStatus;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -117,7 +108,7 @@ public class SiteClassificationController {
         lblSummary.setText("Chưa có kết quả phân loại.");
 
         btnClassify.disableProperty().bind(requestTable.getSelectionModel().selectedItemProperty().isNull());
-        btnSendInquiry.disableProperty().bind(resultTable.itemsProperty().isNull());
+        btnSendInquiry.setDisable(true);
 
         requestTable.getSelectionModel()
                 .selectedItemProperty()
@@ -188,11 +179,14 @@ public class SiteClassificationController {
                     httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                InventoryInquirySendResultDTO result =
-                        objectMapper.readValue(response.body(), InventoryInquirySendResultDTO.class);
+    InventoryInquirySendResultDTO result =
+            objectMapper.readValue(response.body(), InventoryInquirySendResultDTO.class);
 
-                showInfo("Gửi yêu cầu hỏi tồn kho thành công", result.getMessage());
-            } else {
+    markResultsAsSent();
+    btnSendInquiry.setDisable(true);
+
+    showInfo("Gửi yêu cầu hỏi tồn kho thành công", result.getMessage());
+} else {
                 showError("Gửi yêu cầu hỏi tồn kho thất bại", response.body());
             }
 
@@ -224,10 +218,7 @@ public class SiteClassificationController {
         colResultItemCode.setCellValueFactory(data -> data.getValue().merchandiseCodeProperty());
         colResultItemName.setCellValueFactory(data -> data.getValue().merchandiseNameProperty());
         colResultRequiredQty.setCellValueFactory(data -> data.getValue().requiredQtyProperty().asObject());
-        colInStock.setCellValueFactory(data -> data.getValue().inStockQuantityProperty().asObject());
-        colClassification.setCellValueFactory(data -> data.getValue().classificationProperty());
-        colTransport.setCellValueFactory(data -> data.getValue().transportProperty());
-        colEstimatedDays.setCellValueFactory(data -> data.getValue().estimatedDaysProperty().asObject());
+        colResultStatus.setCellValueFactory(data -> data.getValue().statusProperty());
     }
 
     private void loadPendingRequests() {
@@ -268,6 +259,7 @@ public class SiteClassificationController {
 
     private void handleRequestSelected(RequestRow selected) {
         resultTable.setItems(FXCollections.observableArrayList());
+        btnSendInquiry.setDisable(true);
         lblSummary.setText("Chưa có kết quả phân loại.");
 
         if (selected == null) {
@@ -310,14 +302,27 @@ public class SiteClassificationController {
     }
 
     private void renderClassificationResult(OrderRequestClassificationDTO result) {
-        lblSummary.setText(result.getMessage());
-        resultTable.setItems(FXCollections.observableArrayList(
-                result.getResults() == null
-                        ? java.util.List.of()
-                        : result.getResults().stream().map(this::toSiteResultRow).toList()
-        ));
-    }
+    lblSummary.setText(result.getMessage());
 
+    var rows = FXCollections.observableArrayList(
+            result.getResults() == null
+                    ? java.util.List.<SiteResultRow>of()
+                    : result.getResults().stream().map(this::toSiteResultRow).toList()
+    );
+
+    resultTable.setItems(rows);
+
+boolean allSent = rows.stream()
+        .allMatch(row -> "Đã gửi hỏi tồn kho".equals(row.getStatus()));
+
+btnSendInquiry.setDisable(rows.isEmpty() || allSent);
+}
+    private void markResultsAsSent() {
+    for (SiteResultRow row : resultTable.getItems()) {
+        row.setStatus("Đã gửi hỏi tồn kho");
+    }
+    resultTable.refresh();
+}
     private RequestItemRow toRequestItemRow(OrderRequestDetailDTO.ItemDTO dto) {
         return new RequestItemRow(
                 dto.getId(),
@@ -329,22 +334,20 @@ public class SiteClassificationController {
     }
 
     private SiteResultRow toSiteResultRow(SiteClassificationResultDTO dto) {
-        return new SiteResultRow(
-                dto.getSiteCode(),
-                dto.getSiteName(),
-                dto.getMerchandiseCode(),
-                dto.getMerchandiseName(),
-                dto.getRequiredQuantity(),
-                dto.getInStockQuantity(),
-                dto.getClassification(),
-                dto.getSuggestedTransportMeans(),
-                dto.getEstimatedDeliveryDays()
-        );
-    }
+    return new SiteResultRow(
+            dto.getSiteCode(),
+            dto.getSiteName(),
+            dto.getMerchandiseCode(),
+            dto.getMerchandiseName(),
+            dto.getRequiredQuantity(),
+            dto.getStatus()
+    );
+}
 
     private void clearDetails() {
         itemTable.setItems(FXCollections.observableArrayList());
         resultTable.setItems(FXCollections.observableArrayList());
+        btnSendInquiry.setDisable(true);
         lblSummary.setText("Chưa có kết quả phân loại.");
     }
 
@@ -403,6 +406,7 @@ public class SiteClassificationController {
         public SimpleStringProperty statusProperty() {
             return status;
         }
+        
 
         public SimpleStringProperty desiredDateProperty() {
             return desiredDate;
@@ -446,73 +450,58 @@ public class SiteClassificationController {
     }
 
     public static class SiteResultRow {
-        private final SimpleStringProperty siteCode;
-        private final SimpleStringProperty siteName;
-        private final SimpleStringProperty merchandiseCode;
-        private final SimpleStringProperty merchandiseName;
-        private final SimpleIntegerProperty requiredQty;
-        private final SimpleIntegerProperty inStockQuantity;
-        private final SimpleStringProperty classification;
-        private final SimpleStringProperty transport;
-        private final SimpleIntegerProperty estimatedDays;
+    private final SimpleStringProperty siteCode;
+    private final SimpleStringProperty siteName;
+    private final SimpleStringProperty merchandiseCode;
+    private final SimpleStringProperty merchandiseName;
+    private final SimpleIntegerProperty requiredQty;
+    private final SimpleStringProperty status;
 
-        public SiteResultRow(
-                String siteCode,
-                String siteName,
-                String merchandiseCode,
-                String merchandiseName,
-                Integer requiredQty,
-                Integer inStockQuantity,
-                String classification,
-                String transport,
-                Integer estimatedDays
-        ) {
-            this.siteCode = new SimpleStringProperty(siteCode == null ? "" : siteCode);
-            this.siteName = new SimpleStringProperty(siteName == null ? "" : siteName);
-            this.merchandiseCode = new SimpleStringProperty(merchandiseCode == null ? "" : merchandiseCode);
-            this.merchandiseName = new SimpleStringProperty(merchandiseName == null ? "" : merchandiseName);
-            this.requiredQty = new SimpleIntegerProperty(requiredQty == null ? 0 : requiredQty);
-            this.inStockQuantity = new SimpleIntegerProperty(inStockQuantity == null ? 0 : inStockQuantity);
-            this.classification = new SimpleStringProperty(classification == null ? "" : classification);
-            this.transport = new SimpleStringProperty(transport == null ? "" : transport);
-            this.estimatedDays = new SimpleIntegerProperty(estimatedDays == null ? 0 : estimatedDays);
-        }
-
-        public SimpleStringProperty siteCodeProperty() {
-            return siteCode;
-        }
-
-        public SimpleStringProperty siteNameProperty() {
-            return siteName;
-        }
-
-        public SimpleStringProperty merchandiseCodeProperty() {
-            return merchandiseCode;
-        }
-
-        public SimpleStringProperty merchandiseNameProperty() {
-            return merchandiseName;
-        }
-
-        public SimpleIntegerProperty requiredQtyProperty() {
-            return requiredQty;
-        }
-
-        public SimpleIntegerProperty inStockQuantityProperty() {
-            return inStockQuantity;
-        }
-
-        public SimpleStringProperty classificationProperty() {
-            return classification;
-        }
-
-        public SimpleStringProperty transportProperty() {
-            return transport;
-        }
-
-        public SimpleIntegerProperty estimatedDaysProperty() {
-            return estimatedDays;
-        }
+    public SiteResultRow(
+            String siteCode,
+            String siteName,
+            String merchandiseCode,
+            String merchandiseName,
+            Integer requiredQty,
+            String status
+    ) {
+        this.siteCode = new SimpleStringProperty(siteCode == null ? "" : siteCode);
+        this.siteName = new SimpleStringProperty(siteName == null ? "" : siteName);
+        this.merchandiseCode = new SimpleStringProperty(merchandiseCode == null ? "" : merchandiseCode);
+        this.merchandiseName = new SimpleStringProperty(merchandiseName == null ? "" : merchandiseName);
+        this.requiredQty = new SimpleIntegerProperty(requiredQty == null ? 0 : requiredQty);
+        this.status = new SimpleStringProperty(status == null ? "" : status);
     }
+
+    public SimpleStringProperty siteCodeProperty() {
+        return siteCode;
+    }
+
+    public SimpleStringProperty siteNameProperty() {
+        return siteName;
+    }
+
+    public SimpleStringProperty merchandiseCodeProperty() {
+        return merchandiseCode;
+    }
+
+    public SimpleStringProperty merchandiseNameProperty() {
+        return merchandiseName;
+    }
+
+    public SimpleIntegerProperty requiredQtyProperty() {
+        return requiredQty;
+    }
+
+    public SimpleStringProperty statusProperty() {
+        return status;
+    }
+    public String getStatus() {
+    return status.get();
+}
+    public void setStatus(String value) {
+    status.set(value == null ? "" : value);
+}
+}
 }
 

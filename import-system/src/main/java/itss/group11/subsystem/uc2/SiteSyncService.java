@@ -1,7 +1,6 @@
 package itss.group11.subsystem.uc2;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import itss.group11.entity.chung.ImportSite;
+import itss.group11.entity.chung.InventoryInquiry;
+import itss.group11.entity.chung.InventoryInquiryItem;
+import itss.group11.entity.chung.Merchandise;
+import itss.group11.entity.chung.OrderRequest;
+import itss.group11.entity.chung.OrderRequestItem;
 import itss.group11.entity.uc1.MerchandiseOptionDTO;
 import itss.group11.entity.uc1.OrderRequestDetailDTO;
 import itss.group11.entity.uc1.OrderRequestSummaryDTO;
@@ -19,30 +24,18 @@ import itss.group11.entity.uc2.InventoryInquiryResponseDTO;
 import itss.group11.entity.uc2.InventoryInquirySendResultDTO;
 import itss.group11.entity.uc2.OrderRequestClassificationDTO;
 import itss.group11.entity.uc2.SiteClassificationResultDTO;
-import itss.group11.entity.chung.ImportSite;
-import itss.group11.entity.chung.InventoryInquiry;
-import itss.group11.entity.chung.InventoryInquiryItem;
-import itss.group11.entity.chung.Merchandise;
-import itss.group11.entity.chung.OrderRequest;
-import itss.group11.entity.chung.OrderRequestItem;
 import itss.group11.subsystem.chung.ImportSiteRepository;
-import itss.group11.subsystem.chung.OrderRequestRepository;
 import itss.group11.subsystem.chung.InventoryInquiryRepository;
 import itss.group11.subsystem.chung.MerchandiseRepository;
-import itss.group11.subsystem.chung.SiteInventoryRepository;
+import itss.group11.subsystem.chung.OrderRequestRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class SiteSyncService {
 
-    private static final String CLASS_ENOUGH = "ĐỦ HÀNG";
-    private static final String CLASS_PARTIAL = "ĐÁP ỨNG MỘT PHẦN";
-    private static final String CLASS_EMPTY = "CHƯA CÓ TỒN KHO";
-
     private final MerchandiseRepository merchandiseRepository;
     private final ImportSiteRepository importSiteRepository;
-    private final SiteInventoryRepository siteInventoryRepository;
     private final OrderRequestRepository orderRequestRepository;
     private final InventoryInquiryRepository inventoryInquiryRepository;
 
@@ -73,47 +66,70 @@ public class SiteSyncService {
     }
 
     @Transactional(readOnly = true)
-    public OrderRequestClassificationDTO classifyOrderRequest(String requestCode) {
-        OrderRequest request = findRequest(requestCode);
-        if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new RuntimeException("Yêu cầu nhập hàng chưa có mặt hàng để phân loại.");
-        }
+public OrderRequestClassificationDTO classifyOrderRequest(String requestCode) {
+    OrderRequest request = findRequest(requestCode);
 
-        List<OrderRequestDetailDTO.ItemDTO> items = request.getItems()
-                .stream()
-                .map(this::toRequestItemDTO)
-                .toList();
-
-        List<SiteClassificationResultDTO> results = request.getItems()
-                .stream()
-                .flatMap(item -> classifyItem(item.getMerchandise(), item.getQuantityOrdered())
-                        .getResults()
-                        .stream())
-                .toList();
-
-        int siteCount = (int) results.stream()
-                .map(SiteClassificationResultDTO::getSiteCode)
-                .distinct()
-                .count();
-
-        return OrderRequestClassificationDTO.builder()
-                .requestCode(request.getRequestCode())
-                .status(request.getStatus() == null ? "" : request.getStatus().name())
-                .desiredDeliveryDate(request.getDesiredDeliveryDate() == null
-                        ? ""
-                        : request.getDesiredDeliveryDate().toString())
-                .itemCount(items.size())
-                .siteCount(siteCount)
-                .items(items)
-                .results(results)
-                .message(buildRequestClassificationMessage(request.getRequestCode(), items.size(), siteCount))
-                .build();
+    if (request.getStatus() != OrderRequest.OrderRequestStatus.PENDING) {
+        throw new RuntimeException("Chỉ được phân loại yêu cầu ở trạng thái PENDING.");
     }
+
+    if (request.getItems() == null || request.getItems().isEmpty()) {
+        throw new RuntimeException("Yêu cầu nhập hàng chưa có mặt hàng để phân loại.");
+    }
+
+    List<OrderRequestDetailDTO.ItemDTO> items = request.getItems()
+            .stream()
+            .map(this::toRequestItemDTO)
+            .toList();
+
+    List<SiteClassificationResultDTO> results = request.getItems()
+            .stream()
+            .flatMap(item -> classifyItem(item.getMerchandise(), item.getQuantityOrdered())
+                    .getResults()
+                    .stream())
+            .toList();
+
+    for (SiteClassificationResultDTO result : results) {
+        boolean inquirySent = inventoryInquiryRepository
+                .countByRequestCodeAndSiteCode(
+                        request.getRequestCode(),
+                        result.getSiteCode()
+                ) > 0;
+
+        if (inquirySent) {
+            result.setStatus("Đã gửi hỏi tồn kho");
+        } else {
+            result.setStatus("Chờ gửi hỏi tồn kho");
+        }
+    }
+
+    int siteCount = (int) results.stream()
+            .map(SiteClassificationResultDTO::getSiteCode)
+            .distinct()
+            .count();
+
+    return OrderRequestClassificationDTO.builder()
+            .requestCode(request.getRequestCode())
+            .status(request.getStatus() == null ? "" : request.getStatus().name())
+            .desiredDeliveryDate(request.getDesiredDeliveryDate() == null
+                    ? ""
+                    : request.getDesiredDeliveryDate().toString())
+            .itemCount(items.size())
+            .siteCount(siteCount)
+            .items(items)
+            .results(results)
+            .message(buildRequestClassificationMessage(request.getRequestCode(), items.size(), siteCount))
+            .build();
+}
 
     @Transactional
     public InventoryInquirySendResultDTO sendInventoryInquiry(String requestCode) {
         OrderRequest request = findRequest(requestCode);
         OrderRequestClassificationDTO classification = classifyOrderRequest(requestCode);
+        if (classification.getResults() == null || classification.getResults().isEmpty()) {
+    throw new RuntimeException("Không có site phù hợp để gửi yêu cầu hỏi tồn kho.");
+}       
+        
         Map<String, List<SiteClassificationResultDTO>> resultsBySite = classification.getResults()
                 .stream()
                 .collect(Collectors.groupingBy(
@@ -125,6 +141,15 @@ public class SiteSyncService {
         List<String> inquiryIds = new ArrayList<>();
 
         for (Map.Entry<String, List<SiteClassificationResultDTO>> entry : resultsBySite.entrySet()) {
+                boolean alreadySent = inventoryInquiryRepository
+        .countByRequestCodeAndSiteCode(
+                request.getRequestCode(),
+                entry.getKey()
+        ) > 0;
+
+if (alreadySent) {
+    continue;
+}
             ImportSite site = importSiteRepository.findBySiteCode(entry.getKey())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy site: " + entry.getKey()));
 
@@ -144,7 +169,9 @@ public class SiteSyncService {
             inquiry.setItems(items);
             inquiryIds.add(inventoryInquiryRepository.save(inquiry).getInquiryId());
         }
-
+        if (inquiryIds.isEmpty()) {
+    throw new RuntimeException("Yêu cầu hỏi tồn kho đã được gửi trước đó.");
+}
         return InventoryInquirySendResultDTO.builder()
                 .requestCode(classification.getRequestCode())
                 .itemCount(classification.getItemCount())
@@ -170,44 +197,23 @@ public class SiteSyncService {
     }
 
     private InventoryInquiryResponseDTO classifyItem(Merchandise merchandise, int requiredQuantity) {
-        List<ImportSite> sitesSellingMerchandise =
-                importSiteRepository.findSitesSellingMerchandise(merchandise.getCode());
+    List<ImportSite> sitesSellingMerchandise =
+            importSiteRepository.findSitesSellingMerchandise(merchandise.getCode());
 
-        Map<String, Integer> inventoryBySiteCode =
-                siteInventoryRepository.findByMerchandiseCode(merchandise.getCode())
-                        .stream()
-                        .collect(Collectors.toMap(
-                                inventory -> inventory.getImportSite().getSiteCode(),
-                                inventory -> inventory.getInStockQuantity() == null ? 0 : inventory.getInStockQuantity()
-                        ));
+    List<SiteClassificationResultDTO> results = sitesSellingMerchandise
+            .stream()
+            .map(site -> toResultDTO(site, merchandise, requiredQuantity))
+            .toList();
 
-        List<SiteClassificationResultDTO> results = sitesSellingMerchandise
-                .stream()
-                .map(site -> toResultDTO(site, merchandise, requiredQuantity,
-                        inventoryBySiteCode.getOrDefault(site.getSiteCode(), 0)))
-                .sorted(Comparator
-                        .comparing((SiteClassificationResultDTO result) ->
-                                result.getInStockQuantity() >= requiredQuantity ? 0 : result.getInStockQuantity() > 0 ? 1 : 2)
-                        .thenComparing(SiteClassificationResultDTO::getInStockQuantity, Comparator.reverseOrder())
-                        .thenComparing(SiteClassificationResultDTO::getSiteCode)
-                        .thenComparing(SiteClassificationResultDTO::getMerchandiseCode))
-                .toList();
-
-        int totalStock = results.stream()
-                .map(SiteClassificationResultDTO::getInStockQuantity)
-                .reduce(0, Integer::sum);
-
-        return InventoryInquiryResponseDTO.builder()
-                .merchandiseCode(merchandise.getCode())
-                .merchandiseName(merchandise.getName())
-                .unit(merchandise.getUnit())
-                .requiredQuantity(requiredQuantity)
-                .totalStock(totalStock)
-                .enoughInventory(totalStock >= requiredQuantity)
-                .message(buildMessage(merchandise, requiredQuantity, totalStock, results))
-                .results(results)
-                .build();
-    }
+    return InventoryInquiryResponseDTO.builder()
+            .merchandiseCode(merchandise.getCode())
+            .merchandiseName(merchandise.getName())
+            .unit(merchandise.getUnit())
+            .requiredQuantity(requiredQuantity)
+            .results(results)
+            .message(buildMessage(merchandise, results))
+            .build();
+}
 
     private void validateRequest(InventoryInquiryRequestDTO requestDTO) {
         if (requestDTO == null) {
@@ -252,88 +258,36 @@ public class SiteSyncService {
         return "INQ-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
-    private SiteClassificationResultDTO toResultDTO(
-            ImportSite site,
-            Merchandise merchandise,
-            int requiredQuantity,
-            int inStockQuantity
-    ) {
-        return SiteClassificationResultDTO.builder()
-                .siteCode(site.getSiteCode())
-                .siteName(site.getSiteName())
-                .merchandiseCode(merchandise.getCode())
-                .merchandiseName(merchandise.getName())
-                .unit(merchandise.getUnit())
-                .requiredQuantity(requiredQuantity)
-                .inStockQuantity(inStockQuantity)
-                .classification(classifyStock(inStockQuantity, requiredQuantity))
-                .suggestedTransportMeans(suggestTransportMeans(site))
-                .estimatedDeliveryDays(suggestDeliveryDays(site))
-                .daysByAir(site.getDaysByAir())
-                .daysByShip(site.getDaysByShip())
-                .otherInfo(site.getOtherInfo())
-                .build();
-    }
+   private SiteClassificationResultDTO toResultDTO(
+        ImportSite site,
+        Merchandise merchandise,
+        int requiredQuantity
+) {
+    return SiteClassificationResultDTO.builder()
+            .siteCode(site.getSiteCode())
+            .siteName(site.getSiteName())
+            .merchandiseCode(merchandise.getCode())
+            .merchandiseName(merchandise.getName())
+            .unit(merchandise.getUnit())
+            .requiredQuantity(requiredQuantity)
+            .status("Chờ gửi hỏi tồn kho")
+            .build();
+}
 
-    private String classifyStock(int inStockQuantity, int requiredQuantity) {
-        if (inStockQuantity >= requiredQuantity) {
-            return CLASS_ENOUGH;
-        }
-
-        if (inStockQuantity > 0) {
-            return CLASS_PARTIAL;
-        }
-
-        return CLASS_EMPTY;
-    }
-
-    private String suggestTransportMeans(ImportSite site) {
-        Integer daysByShip = site.getDaysByShip();
-        Integer daysByAir = site.getDaysByAir();
-
-        if (daysByShip != null) {
-            return "SHIP";
-        }
-
-        if (daysByAir != null) {
-            return "AIR";
-        }
-
-        return "N/A";
-    }
-
-    private Integer suggestDeliveryDays(ImportSite site) {
-        String means = suggestTransportMeans(site);
-
-        if ("AIR".equals(means)) {
-            return site.getDaysByAir();
-        }
-
-        if ("SHIP".equals(means)) {
-            return site.getDaysByShip();
-        }
-
-        return null;
-    }
+    
 
     private String buildMessage(
-            Merchandise merchandise,
-            int requiredQuantity,
-            int totalStock,
-            List<SiteClassificationResultDTO> results
-    ) {
-        if (results.isEmpty()) {
-            return "Không có site nào đang kinh doanh mặt hàng " + merchandise.getCode() + ".";
-        }
-
-        if (totalStock >= requiredQuantity) {
-            return "Tổng tồn kho đáp ứng đủ số lượng cần kiểm tra.";
-        }
-
-        return "Tổng tồn kho hiện có chưa đủ. Cần " + requiredQuantity
-                + " " + nullToEmpty(merchandise.getUnit())
-                + ", hiện có " + totalStock + ".";
+        Merchandise merchandise,
+        List<SiteClassificationResultDTO> results
+) {
+    if (results.isEmpty()) {
+        return "Không có site nào kinh doanh mặt hàng " + merchandise.getCode() + ".";
     }
+
+    return "Đã tìm thấy " + results.size()
+            + " site kinh doanh mặt hàng " + merchandise.getCode()
+            + ".";
+}
 
     private String buildRequestClassificationMessage(String requestCode, int itemCount, int siteCount) {
         if (siteCount == 0) {
@@ -386,8 +340,6 @@ public class SiteSyncService {
                 .build();
     }
 
-    private String nullToEmpty(String value) {
-        return value == null ? "" : value;
-    }
+
 }
 

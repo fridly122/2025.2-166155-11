@@ -1,5 +1,7 @@
 package itss.group11.entity.chung;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,4 +21,6 @@ public class Merchandise {
 
     @Column(name = "unit", length = 50)
     private String unit;           // Đơn vị (cái, kg, thùng...)
+    @Column(name = "unit_price", precision = 15, scale = 2)
+    private BigDecimal unitPrice;
 }

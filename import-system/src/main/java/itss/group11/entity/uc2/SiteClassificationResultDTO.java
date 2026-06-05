@@ -19,12 +19,7 @@ public class SiteClassificationResultDTO {
     private String merchandiseName;
     private String unit;
     private Integer requiredQuantity;
-    private Integer inStockQuantity;
-    private String classification;
-    private String suggestedTransportMeans;
-    private Integer estimatedDeliveryDays;
-    private Integer daysByAir;
-    private Integer daysByShip;
+    private String status;
     private String otherInfo;
 }
 

@@ -124,10 +124,7 @@
                         <TableColumn fx:id="colResultItemCode" prefWidth="90.0" text="Mã hàng"/>
                         <TableColumn fx:id="colResultItemName" prefWidth="170.0" text="Tên hàng"/>
                         <TableColumn fx:id="colResultRequiredQty" prefWidth="80.0" text="Cần"/>
-                        <TableColumn fx:id="colInStock" prefWidth="80.0" text="Tồn kho"/>
-                        <TableColumn fx:id="colClassification" prefWidth="140.0" text="Phân loại"/>
-                        <TableColumn fx:id="colTransport" prefWidth="80.0" text="VC"/>
-                        <TableColumn fx:id="colEstimatedDays" prefWidth="80.0" text="Số ngày"/>
+                        <TableColumn fx:id="colResultStatus" prefWidth="140.0" text="Trạng thái"/>
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
