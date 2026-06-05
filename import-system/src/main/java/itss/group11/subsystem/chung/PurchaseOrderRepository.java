@@ -19,5 +19,7 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, St
     List<PurchaseOrder> findByStatusOrderByCreatedAtAsc(PurchaseOrder.PurchaseOrderStatus status);
 
     boolean existsByOrderRequest_RequestCode(String requestCode);
+
+    List<PurchaseOrder> findByOrderRequest_RequestCode(String requestCode);
 }
 

@@ -33,6 +33,7 @@ import itss.group11.entity.uc6.ReconciliationResultDTO;
 import itss.group11.entity.uc6.ReconciliationSubmitDTO;
 import itss.group11.subsystem.chung.DiscrepancyReportRepository;
 import itss.group11.subsystem.chung.InternalWarehouseInventoryRepository;
+import itss.group11.subsystem.chung.OrderRequestRepository;
 import itss.group11.subsystem.chung.PurchaseOrderLineRepository;
 import itss.group11.subsystem.chung.PurchaseOrderRepository;
 import itss.group11.subsystem.uc6.DiscrepancyReportService;
@@ -51,6 +52,9 @@ class PurchaseOrderServiceTest {
 
     @Mock
     private PurchaseOrderLineRepository purchaseOrderLineRepository;
+
+    @Mock
+    private OrderRequestRepository orderRequestRepository;
 
     @Mock
     private DiscrepancyReportRepository discrepancyReportRepository;
@@ -73,6 +77,7 @@ class PurchaseOrderServiceTest {
         purchaseOrderService = new PurchaseOrderService(
                 purchaseOrderRepository,
                 purchaseOrderLineRepository,
+                orderRequestRepository,
                 new ReconciliationValidator(),
                 warehouseInventoryService,
                 discrepancyReportService
@@ -84,10 +89,15 @@ class PurchaseOrderServiceTest {
                 .unit("cai")
                 .build();
 
+        OrderRequest orderRequest = OrderRequest.builder()
+                .requestCode("REQ-001")
+                .status(OrderRequest.OrderRequestStatus.ORDERED)
+                .build();
+
         purchaseOrder = PurchaseOrder.builder()
                 .orderId(ORDER_ID)
                 .status(PurchaseOrder.PurchaseOrderStatus.IN_TRANSIT)
-                .orderRequest(OrderRequest.builder().requestCode("REQ-001").build())
+                .orderRequest(orderRequest)
                 .site(ImportSite.builder().siteCode("SITE-JP").siteName("Tokyo Site").build())
                 .build();
 
@@ -121,6 +131,7 @@ class PurchaseOrderServiceTest {
     @Test
     void reconcile_whenQuantitiesMatch_marksReceivedAndUpdatesInventoryWithoutReport() {
         mockInTransitOrderWithLines(List.of(purchaseOrderLine));
+        mockOrderRequestCompletion("REQ-001", List.of(purchaseOrder));
         when(internalWarehouseInventoryRepository.findByMerchandise_Code("MH-001")).thenReturn(Optional.empty());
         when(internalWarehouseInventoryRepository.save(any(InternalWarehouseInventory.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -144,6 +155,49 @@ class PurchaseOrderServiceTest {
         verify(purchaseOrderLineRepository).save(purchaseOrderLine);
         verify(purchaseOrderRepository).save(purchaseOrder);
         verify(discrepancyReportRepository, never()).save(any(DiscrepancyReport.class));
+        assertEquals(OrderRequest.OrderRequestStatus.COMPLETED, purchaseOrder.getOrderRequest().getStatus());
+        verify(orderRequestRepository).save(purchaseOrder.getOrderRequest());
+    }
+
+    @Test
+    void reconcile_whenAllPurchaseOrdersReceived_marksOrderRequestCompleted() {
+        PurchaseOrder secondOrder = PurchaseOrder.builder()
+                .orderId("PO-002")
+                .status(PurchaseOrder.PurchaseOrderStatus.RECEIVED)
+                .orderRequest(purchaseOrder.getOrderRequest())
+                .build();
+
+        mockInTransitOrderWithLines(List.of(purchaseOrderLine));
+        mockOrderRequestCompletion("REQ-001", List.of(purchaseOrder, secondOrder));
+        when(internalWarehouseInventoryRepository.findByMerchandise_Code("MH-001")).thenReturn(Optional.empty());
+        when(internalWarehouseInventoryRepository.save(any(InternalWarehouseInventory.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        purchaseOrderService.reconcile(ORDER_ID, submitDto(new ReceivedLineDTO(1L, 10)));
+
+        assertEquals(OrderRequest.OrderRequestStatus.COMPLETED, purchaseOrder.getOrderRequest().getStatus());
+        verify(orderRequestRepository).save(purchaseOrder.getOrderRequest());
+    }
+
+    @Test
+    void reconcile_whenAnotherPurchaseOrderStillInTransit_keepsOrderRequestOrdered() {
+        PurchaseOrder secondOrder = PurchaseOrder.builder()
+                .orderId("PO-002")
+                .status(PurchaseOrder.PurchaseOrderStatus.IN_TRANSIT)
+                .orderRequest(purchaseOrder.getOrderRequest())
+                .build();
+
+        mockInTransitOrderWithLines(List.of(purchaseOrderLine));
+        when(purchaseOrderRepository.findByOrderRequest_RequestCode("REQ-001"))
+                .thenReturn(List.of(purchaseOrder, secondOrder));
+        when(internalWarehouseInventoryRepository.findByMerchandise_Code("MH-001")).thenReturn(Optional.empty());
+        when(internalWarehouseInventoryRepository.save(any(InternalWarehouseInventory.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        purchaseOrderService.reconcile(ORDER_ID, submitDto(new ReceivedLineDTO(1L, 10)));
+
+        assertEquals(OrderRequest.OrderRequestStatus.ORDERED, purchaseOrder.getOrderRequest().getStatus());
+        verify(orderRequestRepository, never()).save(any(OrderRequest.class));
     }
 
     @Test
@@ -154,6 +208,7 @@ class PurchaseOrderServiceTest {
                 .build();
 
         mockInTransitOrderWithLines(List.of(purchaseOrderLine));
+        mockOrderRequestCompletion("REQ-001", List.of(purchaseOrder));
         when(internalWarehouseInventoryRepository.findByMerchandise_Code("MH-001")).thenReturn(Optional.of(inventory));
         when(internalWarehouseInventoryRepository.save(any(InternalWarehouseInventory.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -235,6 +290,14 @@ class PurchaseOrderServiceTest {
     private void mockInTransitOrderWithLines(List<PurchaseOrderLine> lines) {
         when(purchaseOrderRepository.findByOrderId(ORDER_ID)).thenReturn(Optional.of(purchaseOrder));
         when(purchaseOrderLineRepository.findByPurchaseOrderOrderByIdAsc(purchaseOrder)).thenReturn(lines);
+    }
+
+    private void mockOrderRequestCompletion(String requestCode, List<PurchaseOrder> purchaseOrders) {
+        when(purchaseOrderRepository.findByOrderRequest_RequestCode(requestCode)).thenReturn(purchaseOrders);
+        when(orderRequestRepository.findByRequestCode(requestCode))
+                .thenReturn(Optional.of(purchaseOrder.getOrderRequest()));
+        when(orderRequestRepository.save(any(OrderRequest.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     private ReconciliationSubmitDTO submitDto(ReceivedLineDTO line) {
