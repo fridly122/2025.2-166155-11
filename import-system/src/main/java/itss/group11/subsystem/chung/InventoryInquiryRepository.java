@@ -7,5 +7,7 @@ import itss.group11.entity.chung.InventoryInquiry;
 
 @Repository
 public interface InventoryInquiryRepository extends JpaRepository<InventoryInquiry, String> {
+
+    boolean existsByOrderRequest_RequestCode(String requestCode);
 }
 

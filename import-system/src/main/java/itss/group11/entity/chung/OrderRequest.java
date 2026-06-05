@@ -49,7 +49,7 @@ public class OrderRequest {
     @Transient
     private String createdBy;
 
-    @OneToMany(mappedBy = "orderRequest", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "orderRequest", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderRequestItem> items;
 
     public enum OrderRequestStatus {

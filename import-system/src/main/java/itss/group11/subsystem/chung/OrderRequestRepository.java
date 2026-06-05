@@ -17,6 +17,8 @@ public interface OrderRequestRepository extends JpaRepository<OrderRequest, Stri
     List<OrderRequest> findByStatusOrderByDesiredDeliveryDateAscCreatedAtAsc(OrderRequest.OrderRequestStatus status);
     List<OrderRequest> findAllByOrderByCreatedAtAsc();
 
+    List<OrderRequest> findByRequestCodeContainingIgnoreCaseOrderByCreatedAtAsc(String requestCode);
+
     @Query("select r.requestCode from OrderRequest r")
     List<String> findAllRequestCodes();
 }

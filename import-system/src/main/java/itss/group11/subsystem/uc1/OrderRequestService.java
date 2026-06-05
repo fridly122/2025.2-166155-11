@@ -18,8 +18,10 @@ import itss.group11.entity.uc1.OrderRequestSummaryDTO;
 import itss.group11.entity.chung.Merchandise;
 import itss.group11.entity.chung.OrderRequest;
 import itss.group11.entity.chung.OrderRequestItem;
-import itss.group11.subsystem.chung.OrderRequestRepository;
+import itss.group11.subsystem.chung.InventoryInquiryRepository;
 import itss.group11.subsystem.chung.MerchandiseRepository;
+import itss.group11.subsystem.chung.OrderRequestRepository;
+import itss.group11.subsystem.chung.PurchaseOrderRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,10 +32,25 @@ public class OrderRequestService {
 
     private final OrderRequestRepository orderRequestRepository;
     private final MerchandiseRepository merchandiseRepository;
+    private final InventoryInquiryRepository inventoryInquiryRepository;
+    private final PurchaseOrderRepository purchaseOrderRepository;
 
     @Transactional(readOnly = true)
     public List<OrderRequestSummaryDTO> getAllRequests() {
         return orderRequestRepository.findAllByOrderByCreatedAtAsc()
+                .stream()
+                .map(this::toSummaryDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderRequestSummaryDTO> searchRequests(String requestCode) {
+        if (requestCode == null || requestCode.isBlank()) {
+            return getAllRequests();
+        }
+
+        return orderRequestRepository
+                .findByRequestCodeContainingIgnoreCaseOrderByCreatedAtAsc(requestCode.trim())
                 .stream()
                 .map(this::toSummaryDTO)
                 .toList();
@@ -77,7 +94,57 @@ public class OrderRequestService {
                 .items(new ArrayList<>())
                 .build();
 
-        for (OrderRequestCreationDTO.ItemDTO itemDTO : dto.getItems()) {
+        request.getItems().addAll(buildItems(request, dto.getItems()));
+
+        OrderRequest savedRequest = orderRequestRepository.save(request);
+        return toDetailDTO(savedRequest);
+    }
+
+    @Transactional
+    public OrderRequestDetailDTO updateRequest(String requestCode, OrderRequestCreationDTO dto) {
+        validateCreationDTO(dto);
+
+        OrderRequest request = orderRequestRepository.findByRequestCode(normalizeRequestCode(requestCode))
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu nhập hàng: " + requestCode));
+
+        ensurePending(request);
+
+        request.setDesiredDeliveryDate(parseDesiredDeliveryDate(dto.getDesiredDeliveryDate()));
+        request.getItems().clear();
+        request.getItems().addAll(buildItems(request, dto.getItems()));
+
+        return toDetailDTO(orderRequestRepository.save(request));
+    }
+
+    @Transactional
+    public String deleteRequest(String requestCode) {
+        String normalizedCode = normalizeRequestCode(requestCode);
+        OrderRequest request = orderRequestRepository.findByRequestCode(normalizedCode)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu nhập hàng: " + requestCode));
+
+        ensurePending(request);
+
+        if (purchaseOrderRepository.existsByOrderRequest_RequestCode(normalizedCode)) {
+            throw new RuntimeException(
+                    "Không thể hủy hoặc xóa yêu cầu đã có đơn đặt hàng. Mã: " + normalizedCode
+            );
+        }
+
+        if (inventoryInquiryRepository.existsByOrderRequest_RequestCode(normalizedCode)) {
+            request.setStatus(OrderRequest.OrderRequestStatus.CANCELLED);
+            orderRequestRepository.save(request);
+            return "Đã hủy yêu cầu nhập hàng: " + normalizedCode
+                    + " (yêu cầu đã có phiếu hỏi tồn kho nên được chuyển sang trạng thái CANCELLED).";
+        }
+
+        orderRequestRepository.delete(request);
+        return "Đã xóa yêu cầu nhập hàng: " + normalizedCode;
+    }
+
+    private List<OrderRequestItem> buildItems(OrderRequest request, List<OrderRequestCreationDTO.ItemDTO> itemDTOs) {
+        List<OrderRequestItem> items = new ArrayList<>();
+
+        for (OrderRequestCreationDTO.ItemDTO itemDTO : itemDTOs) {
             String merchandiseCode = requireText(itemDTO.getMerchandiseCode(), "Mã mặt hàng không được để trống")
                     .toUpperCase();
 
@@ -89,17 +156,26 @@ public class OrderRequestService {
                 throw new RuntimeException("Số lượng đặt phải lớn hơn 0 cho mặt hàng: " + merchandiseCode);
             }
 
-            OrderRequestItem item = OrderRequestItem.builder()
+            items.add(OrderRequestItem.builder()
                     .orderRequest(request)
                     .merchandise(merchandise)
                     .quantityOrdered(quantity)
-                    .build();
-
-            request.getItems().add(item);
+                    .build());
         }
 
-        OrderRequest savedRequest = orderRequestRepository.save(request);
-        return toDetailDTO(savedRequest);
+        return items;
+    }
+
+    private void ensurePending(OrderRequest request) {
+        if (request.getStatus() != OrderRequest.OrderRequestStatus.PENDING) {
+            throw new RuntimeException(
+                    "Chỉ được sửa, hủy hoặc xóa yêu cầu ở trạng thái PENDING. Mã: " + request.getRequestCode()
+                            + ", trạng thái hiện tại: " + request.getStatus());
+        }
+    }
+
+    private String normalizeRequestCode(String requestCode) {
+        return requireText(requestCode, "Mã yêu cầu không được để trống").toUpperCase();
     }
 
     private void validateCreationDTO(OrderRequestCreationDTO dto) {

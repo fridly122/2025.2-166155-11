@@ -9,6 +9,7 @@
 <?import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -36,7 +37,7 @@
             <children>
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                     <children>
-                        <Label text="TẠO YÊU CẦU NHẬP HÀNG" textFill="#2c3e50">
+                        <Label text="QUẢN LÝ YÊU CẦU NHẬP HÀNG" textFill="#2c3e50">
                             <font>
                                 <Font name="System Bold" size="20.0"/>
                             </font>
@@ -56,6 +57,12 @@
                                 <Label text="Thông tin yêu cầu" textFill="#34495e">
                                     <font>
                                         <Font name="System Bold" size="14.0"/>
+                                    </font>
+                                </Label>
+
+                                <Label fx:id="lblEditMode" text="" textFill="#1976d2">
+                                    <font>
+                                        <Font name="System Bold" size="12.0"/>
                                     </font>
                                 </Label>
 
@@ -129,11 +136,18 @@
                                                 prefHeight="38.0"
                                                 text="Xóa form"
                                                 style="-fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-cursor: hand;"/>
-                                        <Button mnemonicParsing="false"
+                                        <Button fx:id="btnCreateRequest"
+                                                mnemonicParsing="false"
                                                 onAction="#handleCreateRequest"
                                                 prefHeight="38.0"
                                                 text="Tạo yêu cầu"
                                                 style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                        <Button fx:id="btnUpdateRequest"
+                                                mnemonicParsing="false"
+                                                onAction="#handleUpdateRequest"
+                                                prefHeight="38.0"
+                                                text="Cập nhật"
+                                                style="-fx-background-color: #6a1b9a; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
                                     </children>
                                 </HBox>
                             </children>
@@ -146,6 +160,38 @@
                                         <Font name="System Bold" size="14.0"/>
                                     </font>
                                 </Label>
+
+                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                    <children>
+                                        <Label text="Tìm mã:" textFill="#34495e"/>
+                                        <TextField fx:id="txtSearchCode"
+                                                   promptText="VD: REQ001"
+                                                   prefWidth="140.0"/>
+                                        <Button mnemonicParsing="false"
+                                                onAction="#handleSearch"
+                                                text="Tìm kiếm"
+                                                style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                        <Button mnemonicParsing="false"
+                                                onAction="#handleShowAll"
+                                                text="Tất cả"
+                                                style="-fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                    </children>
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                    <children>
+                                        <Button fx:id="btnLoadRequest"
+                                                mnemonicParsing="false"
+                                                onAction="#handleLoadSelectedRequest"
+                                                text="Nạp vào form"
+                                                style="-fx-background-color: #00897b; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                        <Button fx:id="btnDeleteRequest"
+                                                mnemonicParsing="false"
+                                                onAction="#handleDeleteRequest"
+                                                text="Hủy / Xóa yêu cầu"
+                                                style="-fx-background-color: #c62828; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                    </children>
+                                </HBox>
 
                                 <TableView fx:id="requestTable" VBox.vgrow="ALWAYS" style="-fx-font-size: 14px;">
                                     <columns>
