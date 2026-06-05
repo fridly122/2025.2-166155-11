@@ -1,0 +1,25 @@
+PERSONAL REPORT TEMPLATE
+
+Each member should create one personal report file containing only the work
+done by that member for the assigned use case, covering exercises 2-7.
+
+Recommended file name:
+
+<MemberName>_<UseCase>_BT2-BT7_Report.docx
+
+Suggested sections:
+
+1. Member information
+2. Assigned use case
+3. Exercise 2 result
+4. Exercise 3 result
+5. Exercise 4 result
+6. Exercise 5 result
+7. Exercise 6 result
+8. Exercise 7 result
+9. Source code and test references
+
+Existing personal artifact placed in this folder:
+
+- BT7_Allocation_Test_Design.md
+

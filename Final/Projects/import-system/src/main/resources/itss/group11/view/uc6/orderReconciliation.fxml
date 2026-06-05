@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="698.0" prefWidth="1360.0"
+            style="-fx-background-color: #f4f7fb; -fx-font-family: 'Segoe UI';"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="itss.group11.controller.uc6.OrderReconciliationController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="76.0" spacing="12.0" style="-fx-background-color: #ffffff; -fx-border-color: transparent transparent #dce3ec transparent;">
+            <padding>
+                <Insets bottom="12.0" left="22.0" right="20.0" top="12.0"/>
+            </padding>
+            <children>
+                <VBox spacing="3.0">
+                    <children>
+                        <Label text="Đối soát và xác nhận nhập kho" textFill="#0f172a">
+                            <font>
+                                <Font name="Segoe UI Bold" size="22.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Kiểm đếm hàng về, tính sai lệch số lượng và giá trị trước khi nhập kho." textFill="#64748b"/>
+                    </children>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Bộ phận quản lý kho"
+                       textFill="#2457a6"
+                       style="-fx-background-color: #e8f0ff; -fx-background-radius: 6; -fx-padding: 8 12; -fx-font-weight: bold;"/>
+            </children>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox prefWidth="300.0" spacing="11.0" style="-fx-background-color: #ffffff; -fx-border-color: transparent #dce3ec transparent transparent;">
+            <padding>
+                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Label text="Đơn đang vận chuyển" textFill="#0f172a">
+                            <font>
+                                <Font name="Segoe UI Bold" size="15.0"/>
+                            </font>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblOrderCount" text="0 đơn" textFill="#64748b"/>
+                    </children>
+                </HBox>
+
+                <TextField fx:id="txtOrderFilter"
+                           promptText="Tìm mã đơn, mã yêu cầu, site..."
+                           prefHeight="34.0"/>
+
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Lọc theo ngày tạo" textFill="#475569"/>
+                        <DatePicker fx:id="dpCreatedDateFilter" prefHeight="34.0" prefWidth="268.0" promptText="Chọn ngày"/>
+                    </children>
+                </VBox>
+
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Lọc theo site" textFill="#475569"/>
+                        <ComboBox fx:id="cbSiteFilter" prefHeight="34.0" prefWidth="268.0" promptText="Tất cả site"/>
+                    </children>
+                </VBox>
+
+                <Button mnemonicParsing="false"
+                        onAction="#handleClearFilters"
+                        prefHeight="32.0"
+                        prefWidth="268.0"
+                        text="Xóa lọc"
+                        style="-fx-background-color: #eef2f7; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-cursor: hand;"/>
+
+                <ListView fx:id="orderList" VBox.vgrow="ALWAYS" style="-fx-background-color: #ffffff; -fx-border-color: #dce3ec; -fx-border-radius: 4;"/>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="13.0" style="-fx-background-color: #f8fafc;">
+            <padding>
+                <Insets bottom="16.0" left="18.0" right="18.0" top="16.0"/>
+            </padding>
+            <children>
+                <VBox spacing="4.0">
+                    <children>
+                        <Label text="Danh sách đối soát" textFill="#0f172a">
+                            <font>
+                                <Font name="Segoe UI Bold" size="16.0"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="lblSelectedPo" text="Chưa chọn đơn hàng" textFill="#64748b"/>
+                        <Label text="Nhập số lượng thực nhận, bấm Tính lại sai lệch để cập nhật lệch số lượng, lệch tiền và trạng thái." textFill="#64748b" wrapText="true"/>
+                    </children>
+                </VBox>
+
+                <TableView fx:id="lineTable" editable="true" VBox.vgrow="ALWAYS" style="-fx-font-size: 13px; -fx-background-color: white;">
+                    <columns>
+                        <TableColumn fx:id="colMerchandiseCode" prefWidth="95.0" text="Mã hàng"/>
+                        <TableColumn fx:id="colMerchandiseName" prefWidth="170.0" text="Mặt hàng"/>
+                        <TableColumn fx:id="colSite" prefWidth="70.0" text="Site"/>
+                        <TableColumn fx:id="colUnitPrice" prefWidth="120.0" text="Giá tiền"/>
+                        <TableColumn fx:id="colOrderedQty" prefWidth="70.0" text="SL đặt"/>
+                        <TableColumn fx:id="colReceivedQty" prefWidth="105.0" text="SL thực nhận"/>
+                        <TableColumn fx:id="colDifferenceQty" prefWidth="80.0" text="Lệch SL"/>
+                        <TableColumn fx:id="colDifferenceAmount" prefWidth="125.0" text="Lệch tiền"/>
+                        <TableColumn fx:id="colLineStatus" prefWidth="95.0" text="Trạng thái"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <children>
+                        <Button fx:id="btnRecalculate"
+                                mnemonicParsing="false"
+                                onAction="#handleRecalculateDiscrepancy"
+                                prefHeight="36.0"
+                                text="Tính lại sai lệch"
+                                style="-fx-background-color: #ffffff; -fx-border-color: #cbd5e1; -fx-border-radius: 5; -fx-text-fill: #0f172a; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                        <Button fx:id="btnCreateReport"
+                                mnemonicParsing="false"
+                                onAction="#handleCreateReport"
+                                prefHeight="36.0"
+                                text="Lập biên bản sai lệch"
+                                style="-fx-background-color: #fff1e6; -fx-border-color: #fed7aa; -fx-border-radius: 5; -fx-text-fill: #c2410c; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                        <Button fx:id="btnConfirm"
+                                mnemonicParsing="false"
+                                onAction="#handleConfirmReconciliation"
+                                prefHeight="36.0"
+                                text="Xác nhận nhập kho"
+                                style="-fx-background-color: #1d4ed8; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </center>
+
+    <right>
+        <VBox prefWidth="345.0" spacing="12.0" style="-fx-background-color: #ffffff; -fx-border-color: transparent transparent transparent #dce3ec;">
+            <padding>
+                <Insets bottom="16.0" left="16.0" right="18.0" top="16.0"/>
+            </padding>
+            <children>
+                <Label text="Thông tin đơn" textFill="#0f172a">
+                    <font>
+                        <Font name="Segoe UI Bold" size="16.0"/>
+                    </font>
+                </Label>
+                <GridPane hgap="12.0" vgap="7.0">
+                    <children>
+                        <Label text="Mã đơn" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <Label fx:id="lblDetailOrderId" text="" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        <Label text="Mã yêu cầu" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <Label fx:id="lblDetailRequestCode" text="" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label text="Nhà cung cấp" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <Label fx:id="lblDetailSupplier" text="" textFill="#334155" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Label text="Site nhận" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <Label fx:id="lblDetailSite" text="" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <Label text="Trạng thái" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <Label fx:id="lblDetailStatus" text="" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                        <Label text="Số mặt hàng" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                        <Label fx:id="lblDetailItemCount" text="0" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                        <Label text="Dòng sai lệch" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                        <Label fx:id="lblDetailDiscrepancyCount" text="0" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                        <Label text="Tổng lệch tiền" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+                        <Label fx:id="lblDetailAmountDifference" text="0 ₫" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                    </children>
+                </GridPane>
+
+                <Separator/>
+
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Label text="Biên bản sai lệch" textFill="#0f172a">
+                            <font>
+                                <Font name="Segoe UI Bold" size="14.0"/>
+                            </font>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnEditReport"
+                                mnemonicParsing="false"
+                                onAction="#handleEditReport"
+                                text="Sửa"
+                                style="-fx-background-color: #eef2ff; -fx-text-fill: #1d4ed8; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                    </children>
+                </HBox>
+                <TextArea fx:id="txtReportPreview"
+                          prefRowCount="7"
+                          promptText="Chưa có biên bản sai lệch."
+                          style="-fx-background-color: #f8fafc;"/>
+
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Label text="Ghi chú nhập kho" textFill="#0f172a">
+                            <font>
+                                <Font name="Segoe UI Bold" size="14.0"/>
+                            </font>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnEditReceivingNote"
+                                mnemonicParsing="false"
+                                onAction="#handleEditReceivingNote"
+                                text="Sửa"
+                                style="-fx-background-color: #eef2ff; -fx-text-fill: #1d4ed8; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                    </children>
+                </HBox>
+                <TextArea fx:id="txtReceivingNotePreview"
+                          prefRowCount="5"
+                          promptText="Chưa có ghi chú nhập kho."
+                          style="-fx-background-color: #f8fafc;"/>
+
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Trạng thái xác nhận nhập kho" textFill="#0f172a">
+                            <font>
+                                <Font name="Segoe UI Bold" size="13.0"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="lblReceivingStatus"
+                               maxWidth="Infinity"
+                               text="Chưa xác nhận nhập kho"
+                               style="-fx-background-color: #f1f5f9; -fx-text-fill: #64748b; -fx-background-radius: 6; -fx-padding: 8 10; -fx-font-weight: bold;"/>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </right>
+</BorderPane>

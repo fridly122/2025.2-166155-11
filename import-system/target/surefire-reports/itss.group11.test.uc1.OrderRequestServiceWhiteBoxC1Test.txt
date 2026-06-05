@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: itss.group11.test.uc1.OrderRequestServiceWhiteBoxC1Test
--------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in itss.group11.test.uc1.OrderRequestServiceWhiteBoxC1Test
