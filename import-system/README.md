@@ -1,9 +1,9 @@
 I. CHÚ THÍCH
-1. Lập kế hoạch đặt hàng (Hiếu) - allocation
-2. Tạo yêu cầu nhập hàng (Nguyên) - requestManage
-3. Tìm kiếm Site và phân loại mặt hàng (Hòa) - siteSync
-4. Cập nhật thông tin tồn kho Site (Tài) - warehouse
-5. Quản lý thông tin vận chuyển Site (Nhật) - transport
+1. Tạo yêu cầu nhập hàng (Nguyên) - requestManage
+2. Tìm kiếm Site và phân loại mặt hàng (Hòa) - siteSync
+3. Cập nhật thông tin tồn kho Site (Tài) - warehouse
+4. Quản lý thông tin vận chuyển Site (Nhật) - transport
+5. Xử lý lập kế hoạch đặt hàng (Hiếu) - allocation
 6. Đối soát và xác nhận nhập kho (Cao Anh) - orderExecution
 
 II. LUỒNG HOẠT ĐỘNG GIAO DIỆN TỔNG THỂ (END-TO-END SCREEN FLOW)
@@ -19,7 +19,7 @@ Bước 4: Đối soát và Xác nhận nhập kho - Màn hình 4.1: Danh sách 
 
 III. CHẠY CHƯƠNG TRÌNH
 
-mvn clean javafx:run / mvn javafx:run
+mvn javafx:run
 
 IV. TÀI KHOẢN ĐĂNG NHẬP 
 

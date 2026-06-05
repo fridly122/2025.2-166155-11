@@ -66,7 +66,7 @@ class AllocationServiceWhiteBoxC1Test {
         AllocationPlanDTO plan = allocationService.previewAllocationPlan("REQ101");
 
         assertTrue(plan.isEnoughInventory());
-        assertEquals("Káº¿ hoáº¡ch kháº£ thi.", plan.getMessage());
+        assertEquals("Kế hoạch khả thi.", plan.getMessage());
         assertEquals(2, plan.getPlanItems().size());
         assertEquals("SHIP", plan.getPlanItems().get(0).getDeliveryMeans());
         assertEquals("AIR", plan.getPlanItems().get(1).getDeliveryMeans());
@@ -86,7 +86,7 @@ class AllocationServiceWhiteBoxC1Test {
         AllocationPlanDTO plan = allocationService.previewAllocationPlan("REQ102");
 
         assertTrue(!plan.isEnoughInventory());
-        assertEquals("Cáº£nh bÃ¡o: KhÃ´ng Ä‘á»§ tá»“n kho!", plan.getMessage());
+        assertEquals("Cảnh báo: Không đủ tồn kho!", plan.getMessage());
         assertEquals(1, plan.getPlanItems().size());
         assertEquals(4, plan.getPlanItems().get(0).getAllocatedQuantity());
     }

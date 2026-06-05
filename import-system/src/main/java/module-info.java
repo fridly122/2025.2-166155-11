@@ -39,7 +39,12 @@ module itss.group11 {
     opens itss.group11.entity.uc2 to com.fasterxml.jackson.databind, spring.core, spring.beans, spring.context;
     opens itss.group11.entity.uc3 to com.fasterxml.jackson.databind, spring.core, spring.beans, spring.context;
     opens itss.group11.entity.uc4 to com.fasterxml.jackson.databind, spring.core, spring.beans, spring.context;
-    opens itss.group11.entity.uc5 to com.fasterxml.jackson.databind, spring.core, spring.beans, spring.context;
+    opens itss.group11.entity.uc5 to
+            org.hibernate.orm.core,
+            com.fasterxml.jackson.databind,
+            spring.core,
+            spring.beans,
+            spring.context;
     opens itss.group11.entity.uc6 to com.fasterxml.jackson.databind, spring.core, spring.beans, spring.context;
 
     opens itss.group11.subsystem.chung to

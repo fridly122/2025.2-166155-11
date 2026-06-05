@@ -18,7 +18,7 @@ final class AllocationServiceTestData {
         return Merchandise.builder()
                 .code(code)
                 .name("Merchandise " + code)
-                .unit("Chiáº¿c")
+                .unit("Chiếc")
                 .build();
     }
 

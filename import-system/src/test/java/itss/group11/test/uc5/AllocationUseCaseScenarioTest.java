@@ -111,7 +111,7 @@ class AllocationUseCaseScenarioTest {
                 () -> allocationService.processAllocationPlan("REQ203")
         );
 
-        assertTrue(exception.getMessage().contains("khÃ´ng á»Ÿ tráº¡ng thÃ¡i PENDING"));
+        assertTrue(exception.getMessage().contains("không ở trạng thái PENDING"));
         verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
     }
 

@@ -96,7 +96,7 @@ class AllocationServiceBlackBoxTest {
                 () -> allocationService.processAllocationPlan("REQ404")
         );
 
-        assertTrue(exception.getMessage().contains("KhÃ´ng tÃ¬m tháº¥y yÃªu cáº§u nháº­p hÃ ng"));
+        assertTrue(exception.getMessage().contains("Không tìm thấy yêu cầu nhập hàng"));
         verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
     }
 
@@ -114,7 +114,7 @@ class AllocationServiceBlackBoxTest {
                 () -> allocationService.processAllocationPlan("REQ002")
         );
 
-        assertTrue(exception.getMessage().contains("khÃ´ng á»Ÿ tráº¡ng thÃ¡i PENDING"));
+        assertTrue(exception.getMessage().contains("không ở trạng thái PENDING"));
         verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
     }
 
@@ -132,7 +132,7 @@ class AllocationServiceBlackBoxTest {
                 () -> allocationService.processAllocationPlan("REQ003")
         );
 
-        assertTrue(exception.getMessage().contains("chÆ°a cÃ³ máº·t hÃ ng"));
+        assertTrue(exception.getMessage().contains("chưa có mặt hàng"));
         verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
     }
 
