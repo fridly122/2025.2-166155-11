@@ -179,11 +179,14 @@ public class SiteClassificationController {
                     httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                InventoryInquirySendResultDTO result =
-                        objectMapper.readValue(response.body(), InventoryInquirySendResultDTO.class);
+    InventoryInquirySendResultDTO result =
+            objectMapper.readValue(response.body(), InventoryInquirySendResultDTO.class);
 
-                showInfo("Gửi yêu cầu hỏi tồn kho thành công", result.getMessage());
-            } else {
+    markResultsAsSent();
+    btnSendInquiry.setDisable(true);
+
+    showInfo("Gửi yêu cầu hỏi tồn kho thành công", result.getMessage());
+} else {
                 showError("Gửi yêu cầu hỏi tồn kho thất bại", response.body());
             }
 
@@ -308,9 +311,18 @@ public class SiteClassificationController {
     );
 
     resultTable.setItems(rows);
-    btnSendInquiry.setDisable(rows.isEmpty());
-}
 
+boolean allSent = rows.stream()
+        .allMatch(row -> "Đã gửi hỏi tồn kho".equals(row.getStatus()));
+
+btnSendInquiry.setDisable(rows.isEmpty() || allSent);
+}
+    private void markResultsAsSent() {
+    for (SiteResultRow row : resultTable.getItems()) {
+        row.setStatus("Đã gửi hỏi tồn kho");
+    }
+    resultTable.refresh();
+}
     private RequestItemRow toRequestItemRow(OrderRequestDetailDTO.ItemDTO dto) {
         return new RequestItemRow(
                 dto.getId(),
@@ -328,7 +340,7 @@ public class SiteClassificationController {
             dto.getMerchandiseCode(),
             dto.getMerchandiseName(),
             dto.getRequiredQuantity(),
-            "Sẽ gửi hỏi tồn kho"
+            dto.getStatus()
     );
 }
 
@@ -394,6 +406,7 @@ public class SiteClassificationController {
         public SimpleStringProperty statusProperty() {
             return status;
         }
+        
 
         public SimpleStringProperty desiredDateProperty() {
             return desiredDate;
@@ -483,6 +496,12 @@ public class SiteClassificationController {
     public SimpleStringProperty statusProperty() {
         return status;
     }
+    public String getStatus() {
+    return status.get();
+}
+    public void setStatus(String value) {
+    status.set(value == null ? "" : value);
+}
 }
 }
 

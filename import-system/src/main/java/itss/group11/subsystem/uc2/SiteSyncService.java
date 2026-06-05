@@ -66,7 +66,7 @@ public class SiteSyncService {
     }
 
     @Transactional(readOnly = true)
-    public OrderRequestClassificationDTO classifyOrderRequest(String requestCode) {
+public OrderRequestClassificationDTO classifyOrderRequest(String requestCode) {
     OrderRequest request = findRequest(requestCode);
 
     if (request.getStatus() != OrderRequest.OrderRequestStatus.PENDING) {
@@ -77,37 +77,50 @@ public class SiteSyncService {
         throw new RuntimeException("Yêu cầu nhập hàng chưa có mặt hàng để phân loại.");
     }
 
-        List<OrderRequestDetailDTO.ItemDTO> items = request.getItems()
+    List<OrderRequestDetailDTO.ItemDTO> items = request.getItems()
             .stream()
             .map(this::toRequestItemDTO)
             .toList();
 
+    List<SiteClassificationResultDTO> results = request.getItems()
+            .stream()
+            .flatMap(item -> classifyItem(item.getMerchandise(), item.getQuantityOrdered())
+                    .getResults()
+                    .stream())
+            .toList();
 
-        List<SiteClassificationResultDTO> results = request.getItems()
-                .stream()
-                .flatMap(item -> classifyItem(item.getMerchandise(), item.getQuantityOrdered())
-                        .getResults()
-                        .stream())
-                .toList();
+    for (SiteClassificationResultDTO result : results) {
+        boolean inquirySent = inventoryInquiryRepository
+                .countByRequestCodeAndSiteCode(
+                        request.getRequestCode(),
+                        result.getSiteCode()
+                ) > 0;
 
-        int siteCount = (int) results.stream()
-                .map(SiteClassificationResultDTO::getSiteCode)
-                .distinct()
-                .count();
-
-        return OrderRequestClassificationDTO.builder()
-                .requestCode(request.getRequestCode())
-                .status(request.getStatus() == null ? "" : request.getStatus().name())
-                .desiredDeliveryDate(request.getDesiredDeliveryDate() == null
-                        ? ""
-                        : request.getDesiredDeliveryDate().toString())
-                .itemCount(items.size())
-                .siteCount(siteCount)
-                .items(items)
-                .results(results)
-                .message(buildRequestClassificationMessage(request.getRequestCode(), items.size(), siteCount))
-                .build();
+        if (inquirySent) {
+            result.setStatus("Đã gửi hỏi tồn kho");
+        } else {
+            result.setStatus("Chờ gửi hỏi tồn kho");
+        }
     }
+
+    int siteCount = (int) results.stream()
+            .map(SiteClassificationResultDTO::getSiteCode)
+            .distinct()
+            .count();
+
+    return OrderRequestClassificationDTO.builder()
+            .requestCode(request.getRequestCode())
+            .status(request.getStatus() == null ? "" : request.getStatus().name())
+            .desiredDeliveryDate(request.getDesiredDeliveryDate() == null
+                    ? ""
+                    : request.getDesiredDeliveryDate().toString())
+            .itemCount(items.size())
+            .siteCount(siteCount)
+            .items(items)
+            .results(results)
+            .message(buildRequestClassificationMessage(request.getRequestCode(), items.size(), siteCount))
+            .build();
+}
 
     @Transactional
     public InventoryInquirySendResultDTO sendInventoryInquiry(String requestCode) {
@@ -128,6 +141,15 @@ public class SiteSyncService {
         List<String> inquiryIds = new ArrayList<>();
 
         for (Map.Entry<String, List<SiteClassificationResultDTO>> entry : resultsBySite.entrySet()) {
+                boolean alreadySent = inventoryInquiryRepository
+        .countByRequestCodeAndSiteCode(
+                request.getRequestCode(),
+                entry.getKey()
+        ) > 0;
+
+if (alreadySent) {
+    continue;
+}
             ImportSite site = importSiteRepository.findBySiteCode(entry.getKey())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy site: " + entry.getKey()));
 
@@ -147,7 +169,9 @@ public class SiteSyncService {
             inquiry.setItems(items);
             inquiryIds.add(inventoryInquiryRepository.save(inquiry).getInquiryId());
         }
-
+        if (inquiryIds.isEmpty()) {
+    throw new RuntimeException("Yêu cầu hỏi tồn kho đã được gửi trước đó.");
+}
         return InventoryInquirySendResultDTO.builder()
                 .requestCode(classification.getRequestCode())
                 .itemCount(classification.getItemCount())
@@ -246,7 +270,7 @@ public class SiteSyncService {
             .merchandiseName(merchandise.getName())
             .unit(merchandise.getUnit())
             .requiredQuantity(requiredQuantity)
-            .status("Sẽ gửi hỏi tồn kho")
+            .status("Chờ gửi hỏi tồn kho")
             .build();
 }
 
