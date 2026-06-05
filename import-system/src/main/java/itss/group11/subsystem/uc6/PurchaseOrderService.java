@@ -113,14 +113,16 @@ public class PurchaseOrderService {
     }
 
     private PartialOrderSelectionDTO toLineDTO(PurchaseOrderLine line) {
-        int receivedQty = line.getReceivedQty() == null ? 0 : line.getReceivedQty();
+        int orderedQty = line.getOrderedQty() == null ? 0 : line.getOrderedQty();
+        int receivedQty = line.getReceivedQty() == null ? orderedQty : line.getReceivedQty();
         return PartialOrderSelectionDTO.builder()
                 .lineId(line.getId())
                 .merchandiseCode(line.getMerchandise() == null ? "" : line.getMerchandise().getCode())
                 .merchandiseName(line.getMerchandise() == null ? "" : line.getMerchandise().getName())
-                .orderedQty(line.getOrderedQty())
+                .orderedQty(orderedQty)
                 .receivedQty(receivedQty)
-                .differenceQty(line.getOrderedQty() - receivedQty)
+                .differenceQty(orderedQty - receivedQty)
+                .unitPrice(line.getMerchandise() == null ? null : line.getMerchandise().getUnitPrice())
                 .unit(line.getUnit())
                 .build();
     }
