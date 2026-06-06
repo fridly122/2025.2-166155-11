@@ -40,5 +40,14 @@ public interface ImportSiteRepository extends JpaRepository<ImportSite, String> 
             ORDER BY s.siteCode ASC
             """)
     List<ImportSite> findSitesSellingMerchandise(@Param("merchandiseCode") String merchandiseCode);
+
+    @Query("""
+            SELECT DISTINCT s
+            FROM ImportSite s
+            LEFT JOIN FETCH s.merchandiseList m
+            WHERE s.siteCode = :siteCode
+            ORDER BY m.code ASC
+            """)
+    Optional<ImportSite> findBySiteCodeWithMerchandise(@Param("siteCode") String siteCode);
 }
 
