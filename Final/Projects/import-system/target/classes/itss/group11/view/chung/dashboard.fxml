@@ -20,7 +20,7 @@
             <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
          </padding>
          <children>
-            <Label maxWidth="Infinity" text="HỆ THỐNG ĐẶT HÀNG NHẬP KHẨU - NHÓM 11" textFill="WHITE" HBox.hgrow="NEVER">
+            <Label maxWidth="Infinity" text="HỆ THỐNG ĐẶT HÀNG NHẬP KHẨU" textFill="WHITE" HBox.hgrow="NEVER">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -84,4 +84,3 @@
       </AnchorPane>
    </center>
 </BorderPane>
-

@@ -19,7 +19,7 @@
             <children>
                 <HBox alignment="CENTER_LEFT">
                     <children>
-                        <Label text="DANH SÁCH YÊU CẦU CHỜ PHÂN BỔ (UC005)" textFill="#2c3e50">
+                        <Label text="DANH SÁCH YÊU CẦU CHỜ PHÂN BỔ" textFill="#2c3e50">
                             <font>
                                 <Font name="System Bold" size="20.0" />
                             </font>
