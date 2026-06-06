@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import itss.group11.entity.uc5.AllocationInventorySummaryDTO;
 import itss.group11.entity.uc5.AllocationPlanDTO;
 import itss.group11.entity.uc5.AllocationPlanItemDTO;
 import itss.group11.entity.uc5.AllocationRequestRowDTO;
@@ -201,6 +202,33 @@ public class AllocationListController {
                 .append(plan.isEnoughInventory() ? "Đủ hàng" : "Không đủ hàng")
                 .append("\n\n");
 
+        if (plan.getInventorySummaries() != null && !plan.getInventorySummaries().isEmpty()) {
+            builder.append("Thông tin tồn kho thực tế:\n");
+
+            for (AllocationInventorySummaryDTO summary : plan.getInventorySummaries()) {
+                builder.append("- Mặt hàng: ")
+                        .append(summary.getMerchandiseCode());
+
+                if (summary.getMerchandiseName() != null && !summary.getMerchandiseName().isBlank()) {
+                    builder.append(" - ").append(summary.getMerchandiseName());
+                }
+
+                builder.append(" | SL yêu cầu: ")
+                        .append(summary.getRequestedQuantity())
+                        .append(" | Tổng tồn kho thực tế: ")
+                        .append(summary.getTotalInStockQuantity());
+
+                if (summary.getShortageQuantity() > 0) {
+                    builder.append(" | Thiếu: ")
+                            .append(summary.getShortageQuantity());
+                }
+
+                builder.append("\n");
+            }
+
+            builder.append("\n");
+        }
+
         if (plan.getPlanItems() == null || plan.getPlanItems().isEmpty()) {
             builder.append("Không có dòng phân bổ nào.");
         } else {
@@ -213,6 +241,10 @@ public class AllocationListController {
                         .append(item.getSiteCode())
                         .append(" - ")
                         .append(item.getSiteName())
+                        .append(" | SL yêu cầu: ")
+                        .append(item.getRequestedQuantity())
+                        .append(" | Tồn kho site: ")
+                        .append(item.getInStockQuantity())
                         .append(" | SL phân bổ: ")
                         .append(item.getAllocatedQuantity())
                         .append(" | VC: ")

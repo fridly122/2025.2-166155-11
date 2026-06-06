@@ -14,5 +14,6 @@ public class AllocationPlanDTO {
     private String requestCode;
     private boolean isEnoughInventory; // true: Đủ hàng, false: Bị thiếu hàng
     private String message;
+    private List<AllocationInventorySummaryDTO> inventorySummaries;
     private List<AllocationPlanItemDTO> planItems;
 }

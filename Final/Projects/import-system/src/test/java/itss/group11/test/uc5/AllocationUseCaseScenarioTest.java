@@ -71,7 +71,11 @@ class AllocationUseCaseScenarioTest {
         AllocationResultDTO result = allocationService.processAllocationPlan("REQ201");
 
         assertTrue(preview.isEnoughInventory());
+        assertEquals(1, preview.getInventorySummaries().size());
+        assertEquals(8, preview.getInventorySummaries().get(0).getRequestedQuantity());
+        assertEquals(8, preview.getInventorySummaries().get(0).getTotalInStockQuantity());
         assertEquals(1, preview.getPlanItems().size());
+        assertEquals(8, preview.getPlanItems().get(0).getInStockQuantity());
         assertTrue(result.isSuccess());
         assertEquals(OrderRequest.OrderRequestStatus.ORDERED, request.getStatus());
         verify(orderRequestRepository).save(request);

@@ -4,17 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllocationPlanItemDTO {
+public class AllocationInventorySummaryDTO {
     private String merchandiseCode;
-    private String siteCode;
-    private String siteName;
+    private String merchandiseName;
     private int requestedQuantity;
-    private int inStockQuantity;
-    private int allocatedQuantity;
-    private String deliveryMeans;
+    private int totalInStockQuantity;
+    private int shortageQuantity;
 }
-

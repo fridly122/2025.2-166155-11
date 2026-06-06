@@ -67,10 +67,18 @@ class AllocationServiceWhiteBoxC1Test {
 
         assertTrue(plan.isEnoughInventory());
         assertEquals("Kế hoạch khả thi.", plan.getMessage());
+        assertEquals(1, plan.getInventorySummaries().size());
+        assertEquals(5, plan.getInventorySummaries().get(0).getRequestedQuantity());
+        assertEquals(105, plan.getInventorySummaries().get(0).getTotalInStockQuantity());
+        assertEquals(0, plan.getInventorySummaries().get(0).getShortageQuantity());
         assertEquals(2, plan.getPlanItems().size());
         assertEquals("SHIP", plan.getPlanItems().get(0).getDeliveryMeans());
         assertEquals("AIR", plan.getPlanItems().get(1).getDeliveryMeans());
+        assertEquals(5, plan.getPlanItems().get(0).getRequestedQuantity());
+        assertEquals(3, plan.getPlanItems().get(0).getInStockQuantity());
         assertEquals(3, plan.getPlanItems().get(0).getAllocatedQuantity());
+        assertEquals(5, plan.getPlanItems().get(1).getRequestedQuantity());
+        assertEquals(2, plan.getPlanItems().get(1).getInStockQuantity());
         assertEquals(2, plan.getPlanItems().get(1).getAllocatedQuantity());
     }
 
@@ -87,8 +95,33 @@ class AllocationServiceWhiteBoxC1Test {
 
         assertTrue(!plan.isEnoughInventory());
         assertEquals("Cảnh báo: Không đủ tồn kho!", plan.getMessage());
+        assertEquals(1, plan.getInventorySummaries().size());
+        assertEquals(10, plan.getInventorySummaries().get(0).getRequestedQuantity());
+        assertEquals(4, plan.getInventorySummaries().get(0).getTotalInStockQuantity());
+        assertEquals(6, plan.getInventorySummaries().get(0).getShortageQuantity());
         assertEquals(1, plan.getPlanItems().size());
+        assertEquals(10, plan.getPlanItems().get(0).getRequestedQuantity());
+        assertEquals(4, plan.getPlanItems().get(0).getInStockQuantity());
         assertEquals(4, plan.getPlanItems().get(0).getAllocatedQuantity());
+    }
+
+    @Test
+    void previewAllocationPlan_noStockStillReturnsInventorySummary() {
+        Merchandise laptop = merchandise("MH001");
+        OrderRequest request = pendingRequest("REQ105", item(laptop, 3));
+
+        when(orderRequestRepository.findByRequestCode("REQ105")).thenReturn(Optional.of(request));
+        when(inventoryCheckService.getStockDetailsAcrossSites("MH001")).thenReturn(List.of());
+
+        AllocationPlanDTO plan = allocationService.previewAllocationPlan("REQ105");
+
+        assertTrue(!plan.isEnoughInventory());
+        assertEquals(1, plan.getInventorySummaries().size());
+        assertEquals("MH001", plan.getInventorySummaries().get(0).getMerchandiseCode());
+        assertEquals(3, plan.getInventorySummaries().get(0).getRequestedQuantity());
+        assertEquals(0, plan.getInventorySummaries().get(0).getTotalInStockQuantity());
+        assertEquals(3, plan.getInventorySummaries().get(0).getShortageQuantity());
+        assertTrue(plan.getPlanItems().isEmpty());
     }
 
     @Test

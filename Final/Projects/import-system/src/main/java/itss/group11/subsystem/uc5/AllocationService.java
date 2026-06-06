@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import itss.group11.entity.uc5.AllocationInventorySummaryDTO;
 import itss.group11.entity.uc5.AllocationPlanDTO;
 import itss.group11.entity.uc5.AllocationPlanItemDTO;
 import itss.group11.entity.uc5.AllocationRequestRowDTO;
@@ -51,15 +52,28 @@ public class AllocationService {
     public AllocationPlanDTO previewAllocationPlan(String requestCode) {
         OrderRequest request = findPendingRequest(requestCode);
 
+        List<AllocationInventorySummaryDTO> inventorySummaries = new ArrayList<>();
         List<AllocationPlanItemDTO> planItems = new ArrayList<>();
         boolean isStockEnough = true;
 
         for (OrderRequestItem reqItem : request.getItems()) {
             Merchandise merchandise = reqItem.getMerchandise();
-            int remainingQty = reqItem.getQuantityOrdered();
+            int requestedQuantity = reqItem.getQuantityOrdered();
+            int remainingQty = requestedQuantity;
 
             List<SiteStockDTO> availableStocks =
                     inventoryCheckService.getStockDetailsAcrossSites(merchandise.getCode());
+            int totalInStockQuantity = availableStocks.stream()
+                    .mapToInt(SiteStockDTO::getInStockQuantity)
+                    .sum();
+
+            inventorySummaries.add(AllocationInventorySummaryDTO.builder()
+                    .merchandiseCode(merchandise.getCode())
+                    .merchandiseName(merchandise.getName())
+                    .requestedQuantity(requestedQuantity)
+                    .totalInStockQuantity(totalInStockQuantity)
+                    .shortageQuantity(Math.max(0, requestedQuantity - totalInStockQuantity))
+                    .build());
 
             for (SiteStockDTO stock : availableStocks) {
                 if (remainingQty <= 0) break;
@@ -71,6 +85,8 @@ public class AllocationService {
                         .merchandiseCode(merchandise.getCode())
                         .siteCode(stock.getSiteCode())
                         .siteName(stock.getSiteName())
+                        .requestedQuantity(requestedQuantity)
+                        .inStockQuantity(stock.getInStockQuantity())
                         .allocatedQuantity(qtyToAllocate)
                         .deliveryMeans(suggestDeliveryMeans(stock).name())
                         .build());
@@ -84,6 +100,7 @@ public class AllocationService {
         return AllocationPlanDTO.builder()
                 .requestCode(requestCode)
                 .isEnoughInventory(isStockEnough)
+                .inventorySummaries(inventorySummaries)
                 .planItems(planItems)
                 .message(isStockEnough ? "Kế hoạch khả thi." : "Cảnh báo: Không đủ tồn kho!")
                 .build();
