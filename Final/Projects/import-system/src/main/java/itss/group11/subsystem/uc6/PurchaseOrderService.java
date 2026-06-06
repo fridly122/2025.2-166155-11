@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import itss.group11.entity.chung.OrderRequest;
 import itss.group11.entity.chung.PurchaseOrder;
 import itss.group11.entity.chung.PurchaseOrderLine;
 import itss.group11.entity.uc6.PartialOrderSelectionDTO;
@@ -15,6 +16,7 @@ import itss.group11.entity.uc6.ReceivedLineDTO;
 import itss.group11.entity.uc6.ReconciliationDetailDTO;
 import itss.group11.entity.uc6.ReconciliationResultDTO;
 import itss.group11.entity.uc6.ReconciliationSubmitDTO;
+import itss.group11.subsystem.chung.OrderRequestRepository;
 import itss.group11.subsystem.chung.PurchaseOrderLineRepository;
 import itss.group11.subsystem.chung.PurchaseOrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class PurchaseOrderService {
 
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final PurchaseOrderLineRepository purchaseOrderLineRepository;
+    private final OrderRequestRepository orderRequestRepository;
     private final ReconciliationValidator reconciliationValidator;
     private final WarehouseInventoryService warehouseInventoryService;
     private final DiscrepancyReportService discrepancyReportService;
@@ -39,8 +42,17 @@ public class PurchaseOrderService {
     }
 
     @Transactional(readOnly = true)
+    public List<PurchaseOrderResponseDTO> getReceivedOrders() {
+        return purchaseOrderRepository
+                .findByStatusOrderByCreatedAtDesc(PurchaseOrder.PurchaseOrderStatus.RECEIVED)
+                .stream()
+                .map(this::toPurchaseOrderResponseDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public ReconciliationDetailDTO getReconciliationDetail(String orderId) {
-        PurchaseOrder purchaseOrder = findInTransitOrder(orderId);
+        PurchaseOrder purchaseOrder = findOrder(orderId);
         List<PurchaseOrderLine> lines = purchaseOrderLineRepository.findByPurchaseOrderOrderByIdAsc(purchaseOrder);
 
         return ReconciliationDetailDTO.builder()
@@ -50,6 +62,52 @@ public class PurchaseOrderService {
                 .siteName(purchaseOrder.getSite() == null ? "" : purchaseOrder.getSite().getSiteName())
                 .status(purchaseOrder.getStatus().name())
                 .lines(lines.stream().map(this::toLineDTO).toList())
+                .build();
+    }
+
+    @Transactional
+    public ReconciliationResultDTO updateReceivedOrder(String orderId, ReconciliationSubmitDTO dto) {
+        Map<Long, ReceivedLineDTO> receivedByLineId = reconciliationValidator.toReceivedLineMap(dto);
+        PurchaseOrder purchaseOrder = findOrder(orderId);
+        reconciliationValidator.requireReceived(purchaseOrder);
+
+        List<PurchaseOrderLine> lines = purchaseOrderLineRepository.findByPurchaseOrderOrderByIdAsc(purchaseOrder);
+        reconciliationValidator.requireOnlyExistingLines(receivedByLineId, lines);
+
+        boolean hasDiscrepancy = false;
+        List<String> reportIds = new ArrayList<>();
+
+        for (PurchaseOrderLine line : lines) {
+            ReceivedLineDTO receivedLine = reconciliationValidator.requireReceivedLine(receivedByLineId, line);
+            int previousReceivedQty = line.getReceivedQty() == null ? 0 : line.getReceivedQty();
+            int newReceivedQty = receivedLine.getReceivedQty();
+            boolean quantityChanged = newReceivedQty != previousReceivedQty;
+
+            line.setReceivedQty(newReceivedQty);
+            purchaseOrderLineRepository.save(line);
+            warehouseInventoryService.adjustInternalInventory(
+                    line.getMerchandise(),
+                    newReceivedQty - previousReceivedQty
+            );
+
+            hasDiscrepancy = hasDiscrepancy || line.calculateDifference() != 0;
+            if (quantityChanged) {
+                discrepancyReportService
+                        .createIfDiscrepant(purchaseOrder, line, newReceivedQty, dto)
+                        .ifPresent(reportIds::add);
+            }
+        }
+
+        purchaseOrderRepository.save(purchaseOrder);
+
+        return ReconciliationResultDTO.builder()
+                .orderId(purchaseOrder.getOrderId())
+                .status(purchaseOrder.getStatus().name())
+                .hasDiscrepancy(hasDiscrepancy)
+                .message(hasDiscrepancy
+                        ? "Da cap nhat don da nhap kho, dieu chinh ton kho noi bo va lap bien ban sai lech."
+                        : "Da cap nhat don da nhap kho va dieu chinh ton kho noi bo.")
+                .discrepancyReportIds(reportIds)
                 .build();
     }
 
@@ -81,6 +139,7 @@ public class PurchaseOrderService {
 
         purchaseOrder.setStatus(PurchaseOrder.PurchaseOrderStatus.RECEIVED);
         purchaseOrderRepository.save(purchaseOrder);
+        completeOrderRequestIfApplicable(purchaseOrder);
 
         return ReconciliationResultDTO.builder()
                 .orderId(purchaseOrder.getOrderId())
@@ -93,12 +152,48 @@ public class PurchaseOrderService {
                 .build();
     }
 
-    private PurchaseOrder findInTransitOrder(String orderId) {
-        PurchaseOrder purchaseOrder = purchaseOrderRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new RuntimeException("Khong tim thay don dat hang: " + orderId));
+    private void completeOrderRequestIfApplicable(PurchaseOrder reconciledOrder) {
+        OrderRequest linkedRequest = reconciledOrder.getOrderRequest();
+        if (linkedRequest == null || linkedRequest.getRequestCode() == null || linkedRequest.getRequestCode().isBlank()) {
+            return;
+        }
 
+        String requestCode = linkedRequest.getRequestCode();
+        List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findByOrderRequest_RequestCode(requestCode);
+        if (purchaseOrders.isEmpty()) {
+            return;
+        }
+
+        boolean allFinished = purchaseOrders.stream()
+                .allMatch(order -> order.getStatus() == PurchaseOrder.PurchaseOrderStatus.RECEIVED
+                        || order.getStatus() == PurchaseOrder.PurchaseOrderStatus.CANCELLED);
+        if (!allFinished) {
+            return;
+        }
+
+        boolean hasReceivedOrder = purchaseOrders.stream()
+                .anyMatch(order -> order.getStatus() == PurchaseOrder.PurchaseOrderStatus.RECEIVED);
+        if (!hasReceivedOrder) {
+            return;
+        }
+
+        orderRequestRepository.findByRequestCode(requestCode).ifPresent(orderRequest -> {
+            if (orderRequest.getStatus() == OrderRequest.OrderRequestStatus.ORDERED) {
+                orderRequest.setStatus(OrderRequest.OrderRequestStatus.COMPLETED);
+                orderRequestRepository.save(orderRequest);
+            }
+        });
+    }
+
+    private PurchaseOrder findInTransitOrder(String orderId) {
+        PurchaseOrder purchaseOrder = findOrder(orderId);
         reconciliationValidator.requireInTransit(purchaseOrder);
         return purchaseOrder;
+    }
+
+    private PurchaseOrder findOrder(String orderId) {
+        return purchaseOrderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new RuntimeException("Khong tim thay don dat hang: " + orderId));
     }
 
     private PurchaseOrderResponseDTO toPurchaseOrderResponseDTO(PurchaseOrder purchaseOrder) {

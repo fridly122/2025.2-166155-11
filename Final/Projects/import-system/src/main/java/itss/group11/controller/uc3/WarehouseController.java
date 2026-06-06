@@ -2,6 +2,7 @@ package itss.group11.controller.uc3;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +56,16 @@ public class WarehouseController {
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
                     .body("Không thể tải danh sách mặt hàng: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/sites/{siteCode}/merchandise")
+    public ResponseEntity<?> getMerchandiseOptionsBySite(@PathVariable("siteCode") String siteCode) {
+        try {
+            return ResponseEntity.ok(inventoryManagementService.getMerchandiseOptionsBySite(siteCode));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body("Không thể tải danh sách mặt hàng của site: " + e.getMessage());
         }
     }
 

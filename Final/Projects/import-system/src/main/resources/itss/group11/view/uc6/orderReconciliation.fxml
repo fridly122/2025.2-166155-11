@@ -37,7 +37,7 @@
                                 <Font name="Segoe UI Bold" size="22.0"/>
                             </font>
                         </Label>
-                        <Label text="Kiểm đếm hàng về, tính sai lệch số lượng và giá trị trước khi nhập kho." textFill="#64748b"/>
+                        <Label text="Kiểm đếm hàng về và tính sai lệch số lượng trước khi nhập kho." textFill="#64748b"/>
                     </children>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
@@ -56,13 +56,30 @@
             <children>
                 <HBox alignment="CENTER_LEFT">
                     <children>
-                        <Label text="Đơn đang vận chuyển" textFill="#0f172a">
+                        <Label fx:id="lblOrderListTitle" text="Đơn đang vận chuyển" textFill="#0f172a">
                             <font>
                                 <Font name="Segoe UI Bold" size="15.0"/>
                             </font>
                         </Label>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Label fx:id="lblOrderCount" text="0 đơn" textFill="#64748b"/>
+                    </children>
+                </HBox>
+
+                <HBox spacing="8.0">
+                    <children>
+                        <Button fx:id="btnInTransitMode"
+                                mnemonicParsing="false"
+                                onAction="#handleShowInTransitOrders"
+                                prefHeight="32.0"
+                                prefWidth="130.0"
+                                text="Đang vận chuyển"/>
+                        <Button fx:id="btnReceivedMode"
+                                mnemonicParsing="false"
+                                onAction="#handleShowReceivedOrders"
+                                prefHeight="32.0"
+                                prefWidth="130.0"
+                                text="Đã nhập kho"/>
                     </children>
                 </HBox>
 
@@ -110,20 +127,18 @@
                             </font>
                         </Label>
                         <Label fx:id="lblSelectedPo" text="Chưa chọn đơn hàng" textFill="#64748b"/>
-                        <Label text="Nhập số lượng thực nhận, bấm Tính lại sai lệch để cập nhật lệch số lượng, lệch tiền và trạng thái." textFill="#64748b" wrapText="true"/>
+                        <Label text="Nhập số lượng thực nhận, bấm Tính lại sai lệch để cập nhật lệch số lượng và trạng thái." textFill="#64748b" wrapText="true"/>
                     </children>
                 </VBox>
 
                 <TableView fx:id="lineTable" editable="true" VBox.vgrow="ALWAYS" style="-fx-font-size: 13px; -fx-background-color: white;">
                     <columns>
                         <TableColumn fx:id="colMerchandiseCode" prefWidth="95.0" text="Mã hàng"/>
-                        <TableColumn fx:id="colMerchandiseName" prefWidth="170.0" text="Mặt hàng"/>
-                        <TableColumn fx:id="colSite" prefWidth="70.0" text="Site"/>
-                        <TableColumn fx:id="colUnitPrice" prefWidth="120.0" text="Giá tiền"/>
+                        <TableColumn fx:id="colMerchandiseName" prefWidth="260.0" text="Mặt hàng"/>
                         <TableColumn fx:id="colOrderedQty" prefWidth="70.0" text="SL đặt"/>
                         <TableColumn fx:id="colReceivedQty" prefWidth="105.0" text="SL thực nhận"/>
+                        <TableColumn fx:id="colUnit" prefWidth="70.0" text="Đơn vị"/>
                         <TableColumn fx:id="colDifferenceQty" prefWidth="80.0" text="Lệch SL"/>
-                        <TableColumn fx:id="colDifferenceAmount" prefWidth="125.0" text="Lệch tiền"/>
                         <TableColumn fx:id="colLineStatus" prefWidth="95.0" text="Trạng thái"/>
                     </columns>
                     <columnResizePolicy>
@@ -158,7 +173,7 @@
     </center>
 
     <right>
-        <VBox prefWidth="345.0" spacing="12.0" style="-fx-background-color: #ffffff; -fx-border-color: transparent transparent transparent #dce3ec;">
+        <VBox prefWidth="300.0" spacing="10.0" style="-fx-background-color: #ffffff; -fx-border-color: transparent transparent transparent #dce3ec;">
             <padding>
                 <Insets bottom="16.0" left="16.0" right="18.0" top="16.0"/>
             </padding>
@@ -184,8 +199,6 @@
                         <Label fx:id="lblDetailItemCount" text="0" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
                         <Label text="Dòng sai lệch" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
                         <Label fx:id="lblDetailDiscrepancyCount" text="0" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-                        <Label text="Tổng lệch tiền" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
-                        <Label fx:id="lblDetailAmountDifference" text="0 ₫" textFill="#334155" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
                     </children>
                 </GridPane>
 

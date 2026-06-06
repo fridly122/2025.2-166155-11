@@ -1,6 +1,5 @@
 package itss.group11.subsystem.uc3;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -64,11 +63,26 @@ public class InventoryManagementService {
     public List<MerchandiseOptionDTO> getMerchandiseOptions() {
         return merchandiseRepository.findAllByOrderByCodeAsc()
                 .stream()
-                .map(merchandise -> MerchandiseOptionDTO.builder()
-                        .code(merchandise.getCode())
-                        .name(merchandise.getName())
-                        .unit(merchandise.getUnit())
-                        .build())
+                .map(this::toMerchandiseOptionDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MerchandiseOptionDTO> getMerchandiseOptionsBySite(String siteCode) {
+        if (siteCode == null || siteCode.isBlank()) {
+            throw new RuntimeException("Mã site không được để trống.");
+        }
+
+        ImportSite site = importSiteRepository.findBySiteCodeWithMerchandise(siteCode.trim().toUpperCase())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy site: " + siteCode));
+
+        if (site.getMerchandiseList() == null || site.getMerchandiseList().isEmpty()) {
+            return List.of();
+        }
+
+        return site.getMerchandiseList()
+                .stream()
+                .map(this::toMerchandiseOptionDTO)
                 .toList();
     }
 
@@ -85,6 +99,8 @@ public class InventoryManagementService {
         Merchandise merchandise = merchandiseRepository.findByCode(merchandiseCode)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy mặt hàng: " + merchandiseCode));
 
+        validateSiteSellsMerchandise(siteCode, merchandiseCode);
+
         SiteInventory inventory = siteInventoryRepository
                 .findBySiteCodeAndMerchandiseCode(siteCode, merchandiseCode)
                 .orElseGet(() -> SiteInventory.builder()
@@ -93,7 +109,6 @@ public class InventoryManagementService {
                         .build());
 
         inventory.setInStockQuantity(dto.getInStockQuantity());
-        ensureSiteSellsMerchandise(site, merchandise);
 
         return toInventoryRowDTO(siteInventoryRepository.save(inventory));
     }
@@ -116,19 +131,28 @@ public class InventoryManagementService {
         }
     }
 
-    private void ensureSiteSellsMerchandise(ImportSite site, Merchandise merchandise) {
-        if (site.getMerchandiseList() == null) {
-            site.setMerchandiseList(new ArrayList<>());
-        }
+    private void validateSiteSellsMerchandise(String siteCode, String merchandiseCode) {
+        ImportSite site = importSiteRepository.findBySiteCodeWithMerchandise(siteCode)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy site: " + siteCode));
 
-        boolean alreadyExists = site.getMerchandiseList()
-                .stream()
-                .anyMatch(existing -> merchandise.getCode().equals(existing.getCode()));
+        boolean sellsMerchandise = site.getMerchandiseList() != null
+                && site.getMerchandiseList()
+                        .stream()
+                        .anyMatch(merchandise -> merchandiseCode.equals(merchandise.getCode()));
 
-        if (!alreadyExists) {
-            site.getMerchandiseList().add(merchandise);
-            importSiteRepository.save(site);
+        if (!sellsMerchandise) {
+            throw new RuntimeException(
+                    "Site " + siteCode + " không kinh doanh mặt hàng: " + merchandiseCode
+            );
         }
+    }
+
+    private MerchandiseOptionDTO toMerchandiseOptionDTO(Merchandise merchandise) {
+        return MerchandiseOptionDTO.builder()
+                .code(merchandise.getCode())
+                .name(merchandise.getName())
+                .unit(merchandise.getUnit())
+                .build();
     }
 
     private InventoryRowDTO toInventoryRowDTO(SiteInventory inventory) {

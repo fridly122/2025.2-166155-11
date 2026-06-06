@@ -2,9 +2,11 @@ package itss.group11.controller.uc3;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -90,13 +92,17 @@ public class SiteInventoryManageController {
                 .selectedItemProperty()
                 .addListener((observable, oldValue, selected) -> fillFormFromSelectedRow(selected));
 
-        loadOptions();
+        cboMerchandise.setDisable(true);
+        cboSite.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldSite, newSite) -> handleSiteSelectionChanged(newSite));
+
+        loadSiteOptions();
         loadInventoryRows();
     }
 
     @FXML
     private void handleRefresh() {
-        loadOptions();
+        loadSiteOptions();
         loadInventoryRows();
         clearForm();
     }
@@ -210,9 +216,16 @@ public class SiteInventoryManageController {
         colStockStatus.setCellValueFactory(data -> data.getValue().stockStatusProperty());
     }
 
-    private void loadOptions() {
-        loadSiteOptions();
-        loadMerchandiseOptions();
+    private void handleSiteSelectionChanged(SiteOptionDTO selectedSite) {
+        if (selectedSite == null) {
+            cboMerchandise.getSelectionModel().clearSelection();
+            cboMerchandise.setItems(FXCollections.observableArrayList());
+            cboMerchandise.setDisable(true);
+            return;
+        }
+
+        loadMerchandiseOptionsForSite(selectedSite.getSiteCode());
+        cboMerchandise.setDisable(false);
     }
 
     private void loadSiteOptions() {
@@ -242,10 +255,11 @@ public class SiteInventoryManageController {
         }
     }
 
-    private void loadMerchandiseOptions() {
+    private void loadMerchandiseOptionsForSite(String siteCode) {
         try {
+            String encodedSiteCode = URLEncoder.encode(siteCode, StandardCharsets.UTF_8);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/merchandise"))
+                    .uri(URI.create(BASE_URL + "/sites/" + encodedSiteCode + "/merchandise"))
                     .GET()
                     .build();
 
@@ -257,15 +271,17 @@ public class SiteInventoryManageController {
                         objectMapper.readValue(response.body(), MerchandiseOptionDTO[].class);
 
                 cboMerchandise.setItems(FXCollections.observableArrayList(merchandise));
+                cboMerchandise.getSelectionModel().clearSelection();
             } else {
-                showError("Không thể tải danh sách mặt hàng", response.body());
+                cboMerchandise.setItems(FXCollections.observableArrayList());
+                showError("Không thể tải danh sách mặt hàng của site", response.body());
             }
 
         } catch (IOException e) {
-            showError("Lỗi kết nối", "Không gọi được API danh sách mặt hàng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách mặt hàng của site: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lỗi kết nối", "Không gọi được API danh sách mặt hàng: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API danh sách mặt hàng của site: " + e.getMessage());
         }
     }
 
@@ -326,6 +342,8 @@ public class SiteInventoryManageController {
         );
 
         selectComboSite(selected.getSiteCode());
+        loadMerchandiseOptionsForSite(selected.getSiteCode());
+        cboMerchandise.setDisable(false);
         selectComboMerchandise(selected.getMerchandiseCode());
         spnInStockQuantity.getValueFactory().setValue(selected.getQuantity());
     }
@@ -368,6 +386,8 @@ public class SiteInventoryManageController {
     private void clearForm() {
         cboSite.getSelectionModel().clearSelection();
         cboMerchandise.getSelectionModel().clearSelection();
+        cboMerchandise.setItems(FXCollections.observableArrayList());
+        cboMerchandise.setDisable(true);
         spnInStockQuantity.getValueFactory().setValue(0);
         inventoryTable.getSelectionModel().clearSelection();
         lblSelectedInventory.setText("Chưa chọn dòng tồn kho.");

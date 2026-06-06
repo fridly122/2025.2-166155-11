@@ -1,8 +1,6 @@
 package itss.group11.controller.uc6;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -11,6 +9,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import itss.group11.entity.uc6.PartialOrderSelectionDTO;
+import itss.group11.entity.uc6.PurchaseOrderResponseDTO;
 import itss.group11.entity.uc6.ReceivedLineDTO;
 import itss.group11.entity.uc6.ReconciliationDetailDTO;
 import itss.group11.entity.uc6.ReconciliationResultDTO;
@@ -43,6 +42,17 @@ import javafx.util.converter.IntegerStringConverter;
 
 public class OrderReconciliationController {
 
+    private static final String MODE_ACTIVE_STYLE =
+            "-fx-background-color: #1d4ed8; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;";
+
+    private static final String MODE_BASE_STYLE =
+            "-fx-background-color: #eef2f7; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-cursor: hand;";
+
+    private enum OrderListMode {
+        IN_TRANSIT,
+        RECEIVED
+    }
+
     @FXML
     private TextField txtOrderFilter;
 
@@ -59,6 +69,15 @@ public class OrderReconciliationController {
     private Label lblOrderCount;
 
     @FXML
+    private Label lblOrderListTitle;
+
+    @FXML
+    private Button btnInTransitMode;
+
+    @FXML
+    private Button btnReceivedMode;
+
+    @FXML
     private Label lblSelectedPo;
 
     @FXML
@@ -71,22 +90,16 @@ public class OrderReconciliationController {
     private TableColumn<LineRow, String> colMerchandiseName;
 
     @FXML
-    private TableColumn<LineRow, String> colSite;
-
-    @FXML
-    private TableColumn<LineRow, String> colUnitPrice;
-
-    @FXML
     private TableColumn<LineRow, Integer> colOrderedQty;
 
     @FXML
     private TableColumn<LineRow, Integer> colReceivedQty;
 
     @FXML
-    private TableColumn<LineRow, Integer> colDifferenceQty;
+    private TableColumn<LineRow, String> colUnit;
 
     @FXML
-    private TableColumn<LineRow, String> colDifferenceAmount;
+    private TableColumn<LineRow, Integer> colDifferenceQty;
 
     @FXML
     private TableColumn<LineRow, String> colLineStatus;
@@ -122,9 +135,6 @@ public class OrderReconciliationController {
     private Label lblDetailDiscrepancyCount;
 
     @FXML
-    private Label lblDetailAmountDifference;
-
-    @FXML
     private TextArea txtReportPreview;
 
     @FXML
@@ -140,10 +150,10 @@ public class OrderReconciliationController {
     private Label lblReceivingStatus;
 
     private ReconciliationApiClient apiClient = new HttpReconciliationApiClient();
-    private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private final ObservableList<PurchaseOrderRow> filteredOrders = FXCollections.observableArrayList();
     private final List<PurchaseOrderRow> allOrders = new ArrayList<>();
 
+    private OrderListMode currentMode = OrderListMode.IN_TRANSIT;
     private PurchaseOrderRow selectedOrder;
     private DiscrepancyInput discrepancyInput;
     private ReceivingNoteInput receivingNoteInput;
@@ -160,6 +170,7 @@ public class OrderReconciliationController {
         setupFilters();
         setupReadonlyPanels();
         resetRightPanel();
+        updateModeControls();
 
         updateReportButtonVisibility();
 
@@ -167,12 +178,22 @@ public class OrderReconciliationController {
                 .selectedItemProperty()
                 .addListener((observable, oldValue, selected) -> handleOrderSelected(selected));
 
-        loadInTransitOrders();
+        loadOrdersForCurrentMode();
     }
 
     @FXML
     private void handleRefresh() {
-        loadInTransitOrders();
+        loadOrdersForCurrentMode();
+    }
+
+    @FXML
+    private void handleShowInTransitOrders() {
+        switchMode(OrderListMode.IN_TRANSIT);
+    }
+
+    @FXML
+    private void handleShowReceivedOrders() {
+        switchMode(OrderListMode.RECEIVED);
     }
 
     @FXML
@@ -183,11 +204,38 @@ public class OrderReconciliationController {
         applyFilters();
     }
 
+    private void switchMode(OrderListMode mode) {
+        if (currentMode == mode) {
+            return;
+        }
+
+        currentMode = mode;
+        selectedOrder = null;
+        discrepancyInput = null;
+        receivingNoteInput = null;
+        confirmed = mode == OrderListMode.RECEIVED;
+        if (lineTable.getItems() != null) {
+            lineTable.getItems().clear();
+        }
+        resetRightPanel();
+        updateModeControls();
+        loadOrdersForCurrentMode();
+    }
+
+    private void updateModeControls() {
+        boolean receivedMode = currentMode == OrderListMode.RECEIVED;
+        lblOrderListTitle.setText(receivedMode ? "Đơn đã nhập kho" : "Đơn đang vận chuyển");
+        btnConfirm.setText(receivedMode ? "Cập nhật" : "Xác nhận nhập kho");
+        btnInTransitMode.setStyle(receivedMode ? MODE_BASE_STYLE : MODE_ACTIVE_STYLE);
+        btnReceivedMode.setStyle(receivedMode ? MODE_ACTIVE_STYLE : MODE_BASE_STYLE);
+        orderList.setPlaceholder(new Label(receivedMode ? "Không có đơn RECEIVED." : "Không có đơn IN_TRANSIT."));
+    }
+
     @FXML
     private void handleRecalculateDiscrepancy() {
         recalculateDiscrepancy();
         if (hasDiscrepancy()) {
-            showInfo("Đã tính lại sai lệch", "Bảng đối soát đã cập nhật chênh lệch số lượng và chênh lệch giá tiền.");
+            showInfo("Đã tính lại sai lệch", "Bảng đối soát đã cập nhật chênh lệch số lượng.");
         } else {
             showInfo("Đã tính lại sai lệch", "Không có dòng hàng sai lệch.");
         }
@@ -229,7 +277,9 @@ public class OrderReconciliationController {
     @FXML
     private void handleConfirmReconciliation() {
         if (selectedOrder == null) {
-            showWarning("Chưa chọn đơn", "Vui lòng chọn một đơn đang vận chuyển trước khi xác nhận nhập kho.");
+            showWarning("Chưa chọn đơn", currentMode == OrderListMode.RECEIVED
+                    ? "Vui lòng chọn một đơn đã nhập kho trước khi cập nhật."
+                    : "Vui lòng chọn một đơn đang vận chuyển trước khi xác nhận nhập kho.");
             return;
         }
         if (lineTable.getItems() == null || lineTable.getItems().isEmpty()) {
@@ -238,34 +288,39 @@ public class OrderReconciliationController {
         }
 
         recalculateDiscrepancy();
-        if (hasDiscrepancy() && discrepancyInput == null) {
+        if (currentMode == OrderListMode.IN_TRANSIT && hasDiscrepancy() && discrepancyInput == null) {
             showWarning("Chưa lập biên bản sai lệch", "Đơn đang có sai lệch. Vui lòng lập biên bản sai lệch trước khi xác nhận nhập kho.");
             return;
         }
 
-        Optional<ReceivingNoteInput> noteInput = showReceivingNoteDialog(receivingNoteInput);
-        if (noteInput.isEmpty()) {
-            return;
+        if (currentMode == OrderListMode.IN_TRANSIT) {
+            Optional<ReceivingNoteInput> noteInput = showReceivingNoteDialog(receivingNoteInput);
+            if (noteInput.isEmpty()) {
+                return;
+            }
+            receivingNoteInput = noteInput.get();
+            renderReceivingNotePanel();
         }
-        receivingNoteInput = noteInput.get();
-        renderReceivingNotePanel();
 
         try {
             ReconciliationSubmitDTO dto = buildSubmitDTO();
-            ReconciliationResultDTO result = apiClient.reconcile(selectedOrder.getOrderId(), dto);
+            ReconciliationResultDTO result = currentMode == OrderListMode.RECEIVED
+                    ? apiClient.updateReceivedOrder(selectedOrder.getOrderId(), dto)
+                    : apiClient.reconcile(selectedOrder.getOrderId(), dto);
 
             confirmed = true;
             lblDetailStatus.setText(result.getStatus());
             lblReceivingStatus.setText("Đã xác nhận nhập kho");
             lblReceivingStatus.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-background-radius: 6; -fx-padding: 8 10; -fx-font-weight: bold;");
-            btnConfirm.setDisable(true);
-            showInfo("Nhập kho thành công", buildSuccessMessage(result));
-            loadInTransitOrders();
+            btnConfirm.setDisable(false);
+            showInfo(currentMode == OrderListMode.RECEIVED ? "Cập nhật thành công" : "Nhập kho thành công",
+                    buildSuccessMessage(result));
+            loadOrdersForCurrentMode();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            showError("Lỗi kết nối", "Không gọi được API xác nhận nhập kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API xử lý đơn nhập kho: " + e.getMessage());
         } catch (IOException e) {
-            showError("Lỗi kết nối", "Không gọi được API xác nhận nhập kho: " + e.getMessage());
+            showError("Lỗi kết nối", "Không gọi được API xử lý đơn nhập kho: " + e.getMessage());
         }
     }
 
@@ -306,12 +361,10 @@ public class OrderReconciliationController {
 
         colMerchandiseCode.setCellValueFactory(data -> data.getValue().merchandiseCodeProperty());
         colMerchandiseName.setCellValueFactory(data -> data.getValue().merchandiseNameProperty());
-        colSite.setCellValueFactory(data -> data.getValue().siteProperty());
-        colUnitPrice.setCellValueFactory(data -> data.getValue().unitPriceTextProperty());
         colOrderedQty.setCellValueFactory(data -> data.getValue().orderedQtyProperty().asObject());
         colReceivedQty.setCellValueFactory(data -> data.getValue().receivedQtyProperty().asObject());
+        colUnit.setCellValueFactory(data -> data.getValue().unitProperty());
         colDifferenceQty.setCellValueFactory(data -> data.getValue().differenceQtyProperty().asObject());
-        colDifferenceAmount.setCellValueFactory(data -> data.getValue().differenceAmountTextProperty());
         colLineStatus.setCellValueFactory(data -> data.getValue().statusProperty());
 
         colReceivedQty.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
@@ -325,17 +378,20 @@ public class OrderReconciliationController {
 
             LineRow row = event.getRowValue();
             row.setReceivedQty(value);
-            row.recalculate(currencyFormatter);
+            row.recalculate();
             clearReportIfNoDiscrepancy();
             updateDetailMetrics();
             lineTable.refresh();
         });
     }
 
-    private void loadInTransitOrders() {
+    private void loadOrdersForCurrentMode() {
         try {
             allOrders.clear();
-            allOrders.addAll(apiClient.getInTransitOrders()
+            List<PurchaseOrderResponseDTO> orders = currentMode == OrderListMode.RECEIVED
+                    ? apiClient.getReceivedOrders()
+                    : apiClient.getInTransitOrders();
+            allOrders.addAll(orders
                     .stream()
                     .map(row -> new PurchaseOrderRow(
                             row.getOrderId(),
@@ -419,10 +475,13 @@ public class OrderReconciliationController {
         selectedOrder = selected;
         discrepancyInput = null;
         receivingNoteInput = null;
-        confirmed = false;
-        lblReceivingStatus.setText("Chưa xác nhận nhập kho");
-        lblReceivingStatus.setStyle("-fx-background-color: #fff7ed; -fx-text-fill: #c2410c; -fx-background-radius: 6; -fx-padding: 8 10; -fx-font-weight: bold;");
+        confirmed = currentMode == OrderListMode.RECEIVED;
+        lblReceivingStatus.setText(confirmed ? "Đã xác nhận nhập kho" : "Chưa xác nhận nhập kho");
+        lblReceivingStatus.setStyle(confirmed
+                ? "-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-background-radius: 6; -fx-padding: 8 10; -fx-font-weight: bold;"
+                : "-fx-background-color: #fff7ed; -fx-text-fill: #c2410c; -fx-background-radius: 6; -fx-padding: 8 10; -fx-font-weight: bold;");
         btnConfirm.setDisable(false);
+        btnConfirm.setText(confirmed ? "Cập nhật" : "Xác nhận nhập kho");
         renderReportPanel();
         renderReceivingNotePanel();
         loadReconciliationDetail(selected.getOrderId());
@@ -446,20 +505,17 @@ public class OrderReconciliationController {
     }
 
     private LineRow toLineRow(PartialOrderSelectionDTO dto, ReconciliationDetailDTO detail) {
-        BigDecimal unitPrice = dto.getUnitPrice() == null ? BigDecimal.ZERO : dto.getUnitPrice();
         int orderedQty = dto.getOrderedQty() == null ? 0 : dto.getOrderedQty();
         int receivedQty = dto.getReceivedQty() == null ? orderedQty : dto.getReceivedQty();
         LineRow row = new LineRow(
                 dto.getLineId(),
                 dto.getMerchandiseCode(),
                 dto.getMerchandiseName(),
-                detail.getSiteCode(),
-                unitPrice,
                 orderedQty,
                 receivedQty,
                 dto.getUnit()
         );
-        row.recalculate(currencyFormatter);
+        row.recalculate();
         return row;
     }
 
@@ -477,13 +533,9 @@ public class OrderReconciliationController {
         long discrepancyCount = lineTable.getItems() == null ? 0 : lineTable.getItems().stream()
                 .filter(LineRow::hasDiscrepancy)
                 .count();
-        BigDecimal totalDifferenceAmount = lineTable.getItems() == null ? BigDecimal.ZERO : lineTable.getItems().stream()
-                .map(LineRow::getDifferenceAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         lblDetailItemCount.setText(String.valueOf(itemCount));
         lblDetailDiscrepancyCount.setText(String.valueOf(discrepancyCount));
-        lblDetailAmountDifference.setText(currencyFormatter.format(totalDifferenceAmount));
     }
 
     private void resetRightPanel() {
@@ -495,11 +547,11 @@ public class OrderReconciliationController {
         lblDetailStatus.setText("");
         lblDetailItemCount.setText("0");
         lblDetailDiscrepancyCount.setText("0");
-        lblDetailAmountDifference.setText(currencyFormatter.format(BigDecimal.ZERO));
         renderReportPanel();
         renderReceivingNotePanel();
         lblReceivingStatus.setText("Chưa xác nhận nhập kho");
         lblReceivingStatus.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #64748b; -fx-background-radius: 6; -fx-padding: 8 10; -fx-font-weight: bold;");
+        btnConfirm.setText(currentMode == OrderListMode.RECEIVED ? "Cập nhật" : "Xác nhận nhập kho");
         btnConfirm.setDisable(true);
     }
 
@@ -507,7 +559,7 @@ public class OrderReconciliationController {
         if (lineTable.getItems() == null) {
             return;
         }
-        lineTable.getItems().forEach(row -> row.recalculate(currencyFormatter));
+        lineTable.getItems().forEach(LineRow::recalculate);
         clearReportIfNoDiscrepancy();
         updateDetailMetrics();
         updateReportButtonVisibility();
@@ -523,7 +575,7 @@ public class OrderReconciliationController {
     }
 
     private void updateReportButtonVisibility() {
-        boolean visible = hasDiscrepancy() && !confirmed;
+        boolean visible = currentMode == OrderListMode.IN_TRANSIT && hasDiscrepancy() && !confirmed;
         btnCreateReport.setVisible(visible);
         btnCreateReport.setManaged(visible);
     }
@@ -533,9 +585,18 @@ public class OrderReconciliationController {
     }
 
     private ReconciliationSubmitDTO buildSubmitDTO() {
-        String reason = discrepancyInput == null ? "" : discrepancyInput.reason();
-        String note = discrepancyInput == null ? receivingNoteInput.note() : discrepancyInput.note();
-        String createdBy = discrepancyInput == null ? receivingNoteInput.carrier() : discrepancyInput.createdBy();
+        String reason = "";
+        String note = "";
+        String createdBy = "Nhan vien kho";
+
+        if (discrepancyInput != null) {
+            reason = discrepancyInput.reason();
+            note = discrepancyInput.note();
+            createdBy = discrepancyInput.createdBy();
+        } else if (receivingNoteInput != null) {
+            note = receivingNoteInput.note();
+            createdBy = receivingNoteInput.carrier();
+        }
 
         return new ReconciliationSubmitDTO(
                 lineTable.getItems().stream()
@@ -680,8 +741,6 @@ public class OrderReconciliationController {
                     .append(line.getReceivedQty())
                     .append(", lệch SL ")
                     .append(line.getDifferenceQty())
-                    .append(", lệch tiền ")
-                    .append(line.getDifferenceAmountText())
                     .append("\n");
         }
         return builder.toString();
@@ -697,10 +756,6 @@ public class OrderReconciliationController {
             result.getDiscrepancyReportIds().forEach(reportId -> builder.append("- ").append(reportId).append("\n"));
         }
         return builder.toString();
-    }
-
-    private String formatCurrency(BigDecimal amount) {
-        return currencyFormatter.format(amount == null ? BigDecimal.ZERO : amount);
     }
 
     private String normalize(String value) {
@@ -784,38 +839,27 @@ public class OrderReconciliationController {
         private final SimpleLongProperty lineId;
         private final SimpleStringProperty merchandiseCode;
         private final SimpleStringProperty merchandiseName;
-        private final SimpleStringProperty site;
-        private final BigDecimal unitPrice;
-        private final SimpleStringProperty unitPriceText;
         private final SimpleIntegerProperty orderedQty;
         private final SimpleIntegerProperty receivedQty;
         private final SimpleIntegerProperty differenceQty;
-        private final SimpleStringProperty differenceAmountText;
         private final SimpleStringProperty status;
         private final SimpleStringProperty unit;
-        private BigDecimal differenceAmount = BigDecimal.ZERO;
 
-        public LineRow(Long lineId, String merchandiseCode, String merchandiseName, String site, BigDecimal unitPrice,
+        public LineRow(Long lineId, String merchandiseCode, String merchandiseName,
                        Integer orderedQty, Integer receivedQty, String unit) {
             this.lineId = new SimpleLongProperty(lineId == null ? 0L : lineId);
             this.merchandiseCode = new SimpleStringProperty(merchandiseCode == null ? "" : merchandiseCode);
             this.merchandiseName = new SimpleStringProperty(merchandiseName == null ? "" : merchandiseName);
-            this.site = new SimpleStringProperty(site == null ? "" : site);
-            this.unitPrice = unitPrice == null ? BigDecimal.ZERO : unitPrice;
-            this.unitPriceText = new SimpleStringProperty(formatCurrency(this.unitPrice));
             this.orderedQty = new SimpleIntegerProperty(orderedQty == null ? 0 : orderedQty);
             this.receivedQty = new SimpleIntegerProperty(receivedQty == null ? 0 : receivedQty);
             this.differenceQty = new SimpleIntegerProperty(0);
-            this.differenceAmountText = new SimpleStringProperty(formatCurrency(BigDecimal.ZERO));
             this.status = new SimpleStringProperty("Hợp lệ");
             this.unit = new SimpleStringProperty(unit == null ? "" : unit);
         }
 
-        public void recalculate(NumberFormat formatter) {
+        public void recalculate() {
             int diffQty = orderedQty.get() - receivedQty.get();
             differenceQty.set(diffQty);
-            differenceAmount = unitPrice.multiply(BigDecimal.valueOf(diffQty));
-            differenceAmountText.set(formatter.format(differenceAmount));
             status.set(diffQty == 0 ? "Hợp lệ" : "Sai lệch");
         }
 
@@ -851,28 +895,12 @@ public class OrderReconciliationController {
             return differenceQty.get();
         }
 
-        public BigDecimal getDifferenceAmount() {
-            return differenceAmount;
-        }
-
-        public String getDifferenceAmountText() {
-            return differenceAmountText.get();
-        }
-
         public SimpleStringProperty merchandiseCodeProperty() {
             return merchandiseCode;
         }
 
         public SimpleStringProperty merchandiseNameProperty() {
             return merchandiseName;
-        }
-
-        public SimpleStringProperty siteProperty() {
-            return site;
-        }
-
-        public SimpleStringProperty unitPriceTextProperty() {
-            return unitPriceText;
         }
 
         public SimpleIntegerProperty orderedQtyProperty() {
@@ -885,10 +913,6 @@ public class OrderReconciliationController {
 
         public SimpleIntegerProperty differenceQtyProperty() {
             return differenceQty;
-        }
-
-        public SimpleStringProperty differenceAmountTextProperty() {
-            return differenceAmountText;
         }
 
         public SimpleStringProperty statusProperty() {

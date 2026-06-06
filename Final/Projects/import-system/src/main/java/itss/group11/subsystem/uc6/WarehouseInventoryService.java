@@ -14,7 +14,11 @@ public class WarehouseInventoryService {
     private final InternalWarehouseInventoryRepository internalWarehouseInventoryRepository;
 
     public void increaseInternalInventory(Merchandise merchandise, int receivedQty) {
-        if (merchandise == null || receivedQty <= 0) {
+        adjustInternalInventory(merchandise, receivedQty);
+    }
+
+    public void adjustInternalInventory(Merchandise merchandise, int quantityDelta) {
+        if (merchandise == null || quantityDelta == 0) {
             return;
         }
 
@@ -26,7 +30,13 @@ public class WarehouseInventoryService {
                         .build());
 
         int currentQuantity = inventory.getInStockQuantity() == null ? 0 : inventory.getInStockQuantity();
-        inventory.setInStockQuantity(currentQuantity + receivedQty);
+        int updatedQuantity = currentQuantity + quantityDelta;
+        if (updatedQuantity < 0) {
+            throw new RuntimeException("Ton kho noi bo khong du de cap nhat so luong thuc nhan cho mat hang: "
+                    + merchandise.getCode());
+        }
+
+        inventory.setInStockQuantity(updatedQuantity);
         internalWarehouseInventoryRepository.save(inventory);
     }
 }

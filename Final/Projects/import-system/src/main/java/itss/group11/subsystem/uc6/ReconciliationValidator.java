@@ -22,6 +22,12 @@ public class ReconciliationValidator {
         }
     }
 
+    public void requireReceived(PurchaseOrder purchaseOrder) {
+        if (purchaseOrder.getStatus() != PurchaseOrder.PurchaseOrderStatus.RECEIVED) {
+            throw new RuntimeException("Chi co the cap nhat don hang o trang thai RECEIVED.");
+        }
+    }
+
     public Map<Long, ReceivedLineDTO> toReceivedLineMap(ReconciliationSubmitDTO dto) {
         if (dto == null || dto.getLines() == null || dto.getLines().isEmpty()) {
             throw new RuntimeException("Du lieu doi soat khong duoc de trong.");
