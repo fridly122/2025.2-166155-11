@@ -56,13 +56,30 @@
             <children>
                 <HBox alignment="CENTER_LEFT">
                     <children>
-                        <Label text="Đơn đang vận chuyển" textFill="#0f172a">
+                        <Label fx:id="lblOrderListTitle" text="Đơn đang vận chuyển" textFill="#0f172a">
                             <font>
                                 <Font name="Segoe UI Bold" size="15.0"/>
                             </font>
                         </Label>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Label fx:id="lblOrderCount" text="0 đơn" textFill="#64748b"/>
+                    </children>
+                </HBox>
+
+                <HBox spacing="8.0">
+                    <children>
+                        <Button fx:id="btnInTransitMode"
+                                mnemonicParsing="false"
+                                onAction="#handleShowInTransitOrders"
+                                prefHeight="32.0"
+                                prefWidth="130.0"
+                                text="Đang vận chuyển"/>
+                        <Button fx:id="btnReceivedMode"
+                                mnemonicParsing="false"
+                                onAction="#handleShowReceivedOrders"
+                                prefHeight="32.0"
+                                prefWidth="130.0"
+                                text="Đã nhập kho"/>
                     </children>
                 </HBox>
 
@@ -120,6 +137,7 @@
                         <TableColumn fx:id="colMerchandiseName" prefWidth="260.0" text="Mặt hàng"/>
                         <TableColumn fx:id="colOrderedQty" prefWidth="70.0" text="SL đặt"/>
                         <TableColumn fx:id="colReceivedQty" prefWidth="105.0" text="SL thực nhận"/>
+                        <TableColumn fx:id="colUnit" prefWidth="70.0" text="Đơn vị"/>
                         <TableColumn fx:id="colDifferenceQty" prefWidth="80.0" text="Lệch SL"/>
                         <TableColumn fx:id="colLineStatus" prefWidth="95.0" text="Trạng thái"/>
                     </columns>

@@ -42,8 +42,17 @@ public class PurchaseOrderService {
     }
 
     @Transactional(readOnly = true)
+    public List<PurchaseOrderResponseDTO> getReceivedOrders() {
+        return purchaseOrderRepository
+                .findByStatusOrderByCreatedAtDesc(PurchaseOrder.PurchaseOrderStatus.RECEIVED)
+                .stream()
+                .map(this::toPurchaseOrderResponseDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public ReconciliationDetailDTO getReconciliationDetail(String orderId) {
-        PurchaseOrder purchaseOrder = findInTransitOrder(orderId);
+        PurchaseOrder purchaseOrder = findOrder(orderId);
         List<PurchaseOrderLine> lines = purchaseOrderLineRepository.findByPurchaseOrderOrderByIdAsc(purchaseOrder);
 
         return ReconciliationDetailDTO.builder()
@@ -53,6 +62,52 @@ public class PurchaseOrderService {
                 .siteName(purchaseOrder.getSite() == null ? "" : purchaseOrder.getSite().getSiteName())
                 .status(purchaseOrder.getStatus().name())
                 .lines(lines.stream().map(this::toLineDTO).toList())
+                .build();
+    }
+
+    @Transactional
+    public ReconciliationResultDTO updateReceivedOrder(String orderId, ReconciliationSubmitDTO dto) {
+        Map<Long, ReceivedLineDTO> receivedByLineId = reconciliationValidator.toReceivedLineMap(dto);
+        PurchaseOrder purchaseOrder = findOrder(orderId);
+        reconciliationValidator.requireReceived(purchaseOrder);
+
+        List<PurchaseOrderLine> lines = purchaseOrderLineRepository.findByPurchaseOrderOrderByIdAsc(purchaseOrder);
+        reconciliationValidator.requireOnlyExistingLines(receivedByLineId, lines);
+
+        boolean hasDiscrepancy = false;
+        List<String> reportIds = new ArrayList<>();
+
+        for (PurchaseOrderLine line : lines) {
+            ReceivedLineDTO receivedLine = reconciliationValidator.requireReceivedLine(receivedByLineId, line);
+            int previousReceivedQty = line.getReceivedQty() == null ? 0 : line.getReceivedQty();
+            int newReceivedQty = receivedLine.getReceivedQty();
+            boolean quantityChanged = newReceivedQty != previousReceivedQty;
+
+            line.setReceivedQty(newReceivedQty);
+            purchaseOrderLineRepository.save(line);
+            warehouseInventoryService.adjustInternalInventory(
+                    line.getMerchandise(),
+                    newReceivedQty - previousReceivedQty
+            );
+
+            hasDiscrepancy = hasDiscrepancy || line.calculateDifference() != 0;
+            if (quantityChanged) {
+                discrepancyReportService
+                        .createIfDiscrepant(purchaseOrder, line, newReceivedQty, dto)
+                        .ifPresent(reportIds::add);
+            }
+        }
+
+        purchaseOrderRepository.save(purchaseOrder);
+
+        return ReconciliationResultDTO.builder()
+                .orderId(purchaseOrder.getOrderId())
+                .status(purchaseOrder.getStatus().name())
+                .hasDiscrepancy(hasDiscrepancy)
+                .message(hasDiscrepancy
+                        ? "Da cap nhat don da nhap kho, dieu chinh ton kho noi bo va lap bien ban sai lech."
+                        : "Da cap nhat don da nhap kho va dieu chinh ton kho noi bo.")
+                .discrepancyReportIds(reportIds)
                 .build();
     }
 
@@ -131,11 +186,14 @@ public class PurchaseOrderService {
     }
 
     private PurchaseOrder findInTransitOrder(String orderId) {
-        PurchaseOrder purchaseOrder = purchaseOrderRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new RuntimeException("Khong tim thay don dat hang: " + orderId));
-
+        PurchaseOrder purchaseOrder = findOrder(orderId);
         reconciliationValidator.requireInTransit(purchaseOrder);
         return purchaseOrder;
+    }
+
+    private PurchaseOrder findOrder(String orderId) {
+        return purchaseOrderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new RuntimeException("Khong tim thay don dat hang: " + orderId));
     }
 
     private PurchaseOrderResponseDTO toPurchaseOrderResponseDTO(PurchaseOrder purchaseOrder) {

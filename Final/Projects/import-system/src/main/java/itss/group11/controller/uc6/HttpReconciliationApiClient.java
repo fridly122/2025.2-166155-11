@@ -49,6 +49,20 @@ public class HttpReconciliationApiClient implements ReconciliationApiClient {
     }
 
     @Override
+    public List<PurchaseOrderResponseDTO> getReceivedOrders() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/received"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        requireSuccess(response);
+
+        PurchaseOrderResponseDTO[] rows = objectMapper.readValue(response.body(), PurchaseOrderResponseDTO[].class);
+        return Arrays.asList(rows);
+    }
+
+    @Override
     public ReconciliationDetailDTO getReconciliationDetail(String orderId) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/" + encode(orderId) + "/reconciliation"))
@@ -68,6 +82,21 @@ public class HttpReconciliationApiClient implements ReconciliationApiClient {
                 .uri(URI.create(BASE_URL + "/" + encode(orderId) + "/reconcile"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(dto)))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        requireSuccess(response);
+
+        return objectMapper.readValue(response.body(), ReconciliationResultDTO.class);
+    }
+
+    @Override
+    public ReconciliationResultDTO updateReceivedOrder(String orderId, ReconciliationSubmitDTO dto)
+            throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/" + encode(orderId) + "/received-reconciliation"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(dto)))
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());

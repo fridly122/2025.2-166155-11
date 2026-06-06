@@ -12,7 +12,12 @@ public interface ReconciliationApiClient {
 
     List<PurchaseOrderResponseDTO> getInTransitOrders() throws IOException, InterruptedException;
 
+    List<PurchaseOrderResponseDTO> getReceivedOrders() throws IOException, InterruptedException;
+
     ReconciliationDetailDTO getReconciliationDetail(String orderId) throws IOException, InterruptedException;
 
     ReconciliationResultDTO reconcile(String orderId, ReconciliationSubmitDTO dto) throws IOException, InterruptedException;
+
+    ReconciliationResultDTO updateReceivedOrder(String orderId, ReconciliationSubmitDTO dto)
+            throws IOException, InterruptedException;
 }
