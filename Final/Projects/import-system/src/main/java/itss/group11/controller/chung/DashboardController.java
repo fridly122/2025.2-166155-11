@@ -15,7 +15,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 public class DashboardController {
 
@@ -47,6 +49,12 @@ public class DashboardController {
             "-fx-font-weight: normal; " +
             "-fx-cursor: default; " +
             "-fx-opacity: 0.65;";
+
+    @FXML
+    private BorderPane dashboardRoot;
+
+    @FXML
+    private VBox sidebar;
 
     @FXML
     private AnchorPane contentArea;
@@ -173,8 +181,13 @@ public class DashboardController {
 
         Object controller = loadSubScreen(fxmlPath);
         if (controller != null) {
+            setSidebarVisible(feature != AppFeature.RECONCILIATION);
             setActiveButton(button);
         }
+    }
+
+    private void setSidebarVisible(boolean visible) {
+        dashboardRoot.setLeft(visible ? sidebar : null);
     }
 
     private void setupSidebarHover() {

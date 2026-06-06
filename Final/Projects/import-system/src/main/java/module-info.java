@@ -11,6 +11,7 @@ module itss.group11 {
     requires jakarta.persistence;
     requires org.hibernate.orm.core;
     requires org.postgresql.jdbc;
+    requires com.h2database;
 
     requires spring.boot;
     requires spring.boot.autoconfigure;

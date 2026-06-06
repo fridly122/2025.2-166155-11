@@ -31,19 +31,39 @@ public class ImportSystemBackendApplication {
         Map<String, Object> properties = new HashMap<>();
 
         properties.put("server.port", optionalValue(dotenv, "SERVER_PORT", "8080"));
-        properties.put("spring.datasource.url", requiredValue(dotenv, "DB_URL"));
-        properties.put("spring.datasource.username", requiredValue(dotenv, "DB_USER"));
-        properties.put("spring.datasource.password", requiredValue(dotenv, "DB_PASSWORD"));
-        properties.put("spring.datasource.driver-class-name", "org.postgresql.Driver");
         properties.put("spring.datasource.hikari.maximum-pool-size", optionalValue(dotenv, "DB_MAX_POOL_SIZE", "3"));
         properties.put("spring.datasource.hikari.minimum-idle", optionalValue(dotenv, "DB_MIN_IDLE", "0"));
         properties.put("spring.datasource.hikari.connection-timeout",
                 optionalValue(dotenv, "DB_CONNECTION_TIMEOUT_MS", "5000"));
-        properties.put("spring.jpa.hibernate.ddl-auto", "none");
         properties.put("spring.jpa.open-in-view", "true");
         properties.put("spring.jpa.show-sql", "false");
 
+        String dbUrl = optionalValue(dotenv, "DB_URL", null);
+        if (dbUrl == null || dbUrl.isBlank()) {
+            configureLocalDatabase(properties);
+        } else {
+            configurePostgresDatabase(dotenv, properties, dbUrl);
+        }
+
         return properties;
+    }
+
+    private static void configurePostgresDatabase(Dotenv dotenv, Map<String, Object> properties, String dbUrl) {
+        properties.put("spring.datasource.url", dbUrl);
+        properties.put("spring.datasource.username", requiredValue(dotenv, "DB_USER"));
+        properties.put("spring.datasource.password", requiredValue(dotenv, "DB_PASSWORD"));
+        properties.put("spring.datasource.driver-class-name", "org.postgresql.Driver");
+        properties.put("spring.jpa.hibernate.ddl-auto", optionalValue(dotenv, "DB_DDL_AUTO", "none"));
+    }
+
+    private static void configureLocalDatabase(Map<String, Object> properties) {
+        properties.put("spring.datasource.url",
+                "jdbc:h2:file:./data/import-system-local;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE");
+        properties.put("spring.datasource.username", "sa");
+        properties.put("spring.datasource.password", "");
+        properties.put("spring.datasource.driver-class-name", "org.h2.Driver");
+        properties.put("spring.jpa.database-platform", "org.hibernate.dialect.H2Dialect");
+        properties.put("spring.jpa.hibernate.ddl-auto", "update");
     }
 
     private static String requiredValue(Dotenv dotenv, String key) {

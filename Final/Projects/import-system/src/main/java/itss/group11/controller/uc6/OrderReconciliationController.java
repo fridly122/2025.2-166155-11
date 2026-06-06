@@ -1,8 +1,6 @@
 package itss.group11.controller.uc6;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -71,12 +69,6 @@ public class OrderReconciliationController {
     private TableColumn<LineRow, String> colMerchandiseName;
 
     @FXML
-    private TableColumn<LineRow, String> colSite;
-
-    @FXML
-    private TableColumn<LineRow, String> colUnitPrice;
-
-    @FXML
     private TableColumn<LineRow, Integer> colOrderedQty;
 
     @FXML
@@ -84,9 +76,6 @@ public class OrderReconciliationController {
 
     @FXML
     private TableColumn<LineRow, Integer> colDifferenceQty;
-
-    @FXML
-    private TableColumn<LineRow, String> colDifferenceAmount;
 
     @FXML
     private TableColumn<LineRow, String> colLineStatus;
@@ -122,9 +111,6 @@ public class OrderReconciliationController {
     private Label lblDetailDiscrepancyCount;
 
     @FXML
-    private Label lblDetailAmountDifference;
-
-    @FXML
     private TextArea txtReportPreview;
 
     @FXML
@@ -140,7 +126,6 @@ public class OrderReconciliationController {
     private Label lblReceivingStatus;
 
     private ReconciliationApiClient apiClient = new HttpReconciliationApiClient();
-    private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private final ObservableList<PurchaseOrderRow> filteredOrders = FXCollections.observableArrayList();
     private final List<PurchaseOrderRow> allOrders = new ArrayList<>();
 
@@ -187,7 +172,7 @@ public class OrderReconciliationController {
     private void handleRecalculateDiscrepancy() {
         recalculateDiscrepancy();
         if (hasDiscrepancy()) {
-            showInfo("Đã tính lại sai lệch", "Bảng đối soát đã cập nhật chênh lệch số lượng và chênh lệch giá tiền.");
+            showInfo("Đã tính lại sai lệch", "Bảng đối soát đã cập nhật chênh lệch số lượng.");
         } else {
             showInfo("Đã tính lại sai lệch", "Không có dòng hàng sai lệch.");
         }
@@ -306,12 +291,9 @@ public class OrderReconciliationController {
 
         colMerchandiseCode.setCellValueFactory(data -> data.getValue().merchandiseCodeProperty());
         colMerchandiseName.setCellValueFactory(data -> data.getValue().merchandiseNameProperty());
-        colSite.setCellValueFactory(data -> data.getValue().siteProperty());
-        colUnitPrice.setCellValueFactory(data -> data.getValue().unitPriceTextProperty());
         colOrderedQty.setCellValueFactory(data -> data.getValue().orderedQtyProperty().asObject());
         colReceivedQty.setCellValueFactory(data -> data.getValue().receivedQtyProperty().asObject());
         colDifferenceQty.setCellValueFactory(data -> data.getValue().differenceQtyProperty().asObject());
-        colDifferenceAmount.setCellValueFactory(data -> data.getValue().differenceAmountTextProperty());
         colLineStatus.setCellValueFactory(data -> data.getValue().statusProperty());
 
         colReceivedQty.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
@@ -325,7 +307,7 @@ public class OrderReconciliationController {
 
             LineRow row = event.getRowValue();
             row.setReceivedQty(value);
-            row.recalculate(currencyFormatter);
+            row.recalculate();
             clearReportIfNoDiscrepancy();
             updateDetailMetrics();
             lineTable.refresh();
@@ -446,20 +428,17 @@ public class OrderReconciliationController {
     }
 
     private LineRow toLineRow(PartialOrderSelectionDTO dto, ReconciliationDetailDTO detail) {
-        BigDecimal unitPrice = dto.getUnitPrice() == null ? BigDecimal.ZERO : dto.getUnitPrice();
         int orderedQty = dto.getOrderedQty() == null ? 0 : dto.getOrderedQty();
         int receivedQty = dto.getReceivedQty() == null ? orderedQty : dto.getReceivedQty();
         LineRow row = new LineRow(
                 dto.getLineId(),
                 dto.getMerchandiseCode(),
                 dto.getMerchandiseName(),
-                detail.getSiteCode(),
-                unitPrice,
                 orderedQty,
                 receivedQty,
                 dto.getUnit()
         );
-        row.recalculate(currencyFormatter);
+        row.recalculate();
         return row;
     }
 
@@ -477,13 +456,9 @@ public class OrderReconciliationController {
         long discrepancyCount = lineTable.getItems() == null ? 0 : lineTable.getItems().stream()
                 .filter(LineRow::hasDiscrepancy)
                 .count();
-        BigDecimal totalDifferenceAmount = lineTable.getItems() == null ? BigDecimal.ZERO : lineTable.getItems().stream()
-                .map(LineRow::getDifferenceAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         lblDetailItemCount.setText(String.valueOf(itemCount));
         lblDetailDiscrepancyCount.setText(String.valueOf(discrepancyCount));
-        lblDetailAmountDifference.setText(currencyFormatter.format(totalDifferenceAmount));
     }
 
     private void resetRightPanel() {
@@ -495,7 +470,6 @@ public class OrderReconciliationController {
         lblDetailStatus.setText("");
         lblDetailItemCount.setText("0");
         lblDetailDiscrepancyCount.setText("0");
-        lblDetailAmountDifference.setText(currencyFormatter.format(BigDecimal.ZERO));
         renderReportPanel();
         renderReceivingNotePanel();
         lblReceivingStatus.setText("Chưa xác nhận nhập kho");
@@ -507,7 +481,7 @@ public class OrderReconciliationController {
         if (lineTable.getItems() == null) {
             return;
         }
-        lineTable.getItems().forEach(row -> row.recalculate(currencyFormatter));
+        lineTable.getItems().forEach(LineRow::recalculate);
         clearReportIfNoDiscrepancy();
         updateDetailMetrics();
         updateReportButtonVisibility();
@@ -680,8 +654,6 @@ public class OrderReconciliationController {
                     .append(line.getReceivedQty())
                     .append(", lệch SL ")
                     .append(line.getDifferenceQty())
-                    .append(", lệch tiền ")
-                    .append(line.getDifferenceAmountText())
                     .append("\n");
         }
         return builder.toString();
@@ -697,10 +669,6 @@ public class OrderReconciliationController {
             result.getDiscrepancyReportIds().forEach(reportId -> builder.append("- ").append(reportId).append("\n"));
         }
         return builder.toString();
-    }
-
-    private String formatCurrency(BigDecimal amount) {
-        return currencyFormatter.format(amount == null ? BigDecimal.ZERO : amount);
     }
 
     private String normalize(String value) {
@@ -784,38 +752,27 @@ public class OrderReconciliationController {
         private final SimpleLongProperty lineId;
         private final SimpleStringProperty merchandiseCode;
         private final SimpleStringProperty merchandiseName;
-        private final SimpleStringProperty site;
-        private final BigDecimal unitPrice;
-        private final SimpleStringProperty unitPriceText;
         private final SimpleIntegerProperty orderedQty;
         private final SimpleIntegerProperty receivedQty;
         private final SimpleIntegerProperty differenceQty;
-        private final SimpleStringProperty differenceAmountText;
         private final SimpleStringProperty status;
         private final SimpleStringProperty unit;
-        private BigDecimal differenceAmount = BigDecimal.ZERO;
 
-        public LineRow(Long lineId, String merchandiseCode, String merchandiseName, String site, BigDecimal unitPrice,
+        public LineRow(Long lineId, String merchandiseCode, String merchandiseName,
                        Integer orderedQty, Integer receivedQty, String unit) {
             this.lineId = new SimpleLongProperty(lineId == null ? 0L : lineId);
             this.merchandiseCode = new SimpleStringProperty(merchandiseCode == null ? "" : merchandiseCode);
             this.merchandiseName = new SimpleStringProperty(merchandiseName == null ? "" : merchandiseName);
-            this.site = new SimpleStringProperty(site == null ? "" : site);
-            this.unitPrice = unitPrice == null ? BigDecimal.ZERO : unitPrice;
-            this.unitPriceText = new SimpleStringProperty(formatCurrency(this.unitPrice));
             this.orderedQty = new SimpleIntegerProperty(orderedQty == null ? 0 : orderedQty);
             this.receivedQty = new SimpleIntegerProperty(receivedQty == null ? 0 : receivedQty);
             this.differenceQty = new SimpleIntegerProperty(0);
-            this.differenceAmountText = new SimpleStringProperty(formatCurrency(BigDecimal.ZERO));
             this.status = new SimpleStringProperty("Hợp lệ");
             this.unit = new SimpleStringProperty(unit == null ? "" : unit);
         }
 
-        public void recalculate(NumberFormat formatter) {
+        public void recalculate() {
             int diffQty = orderedQty.get() - receivedQty.get();
             differenceQty.set(diffQty);
-            differenceAmount = unitPrice.multiply(BigDecimal.valueOf(diffQty));
-            differenceAmountText.set(formatter.format(differenceAmount));
             status.set(diffQty == 0 ? "Hợp lệ" : "Sai lệch");
         }
 
@@ -851,28 +808,12 @@ public class OrderReconciliationController {
             return differenceQty.get();
         }
 
-        public BigDecimal getDifferenceAmount() {
-            return differenceAmount;
-        }
-
-        public String getDifferenceAmountText() {
-            return differenceAmountText.get();
-        }
-
         public SimpleStringProperty merchandiseCodeProperty() {
             return merchandiseCode;
         }
 
         public SimpleStringProperty merchandiseNameProperty() {
             return merchandiseName;
-        }
-
-        public SimpleStringProperty siteProperty() {
-            return site;
-        }
-
-        public SimpleStringProperty unitPriceTextProperty() {
-            return unitPriceText;
         }
 
         public SimpleIntegerProperty orderedQtyProperty() {
@@ -885,10 +826,6 @@ public class OrderReconciliationController {
 
         public SimpleIntegerProperty differenceQtyProperty() {
             return differenceQty;
-        }
-
-        public SimpleStringProperty differenceAmountTextProperty() {
-            return differenceAmountText;
         }
 
         public SimpleStringProperty statusProperty() {
